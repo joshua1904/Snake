@@ -6,17 +6,17 @@ import csv
 
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1000, 1000))
+screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 running = True
 walls = list()
 removed_walls = list()
-SIZE = 29
+SIZE = 30
 
 def draw_rect(x: int, y: int, color):
     pygame.draw.rect(screen, color, pygame.Rect(x * SIZE, y * SIZE, SIZE, SIZE))
 def get_map():
-    with open("map.csv", "r") as f:
+    with open("map2.csv", "r") as f:
         return list(csv.reader(f, delimiter=";"))
 
 
@@ -37,7 +37,7 @@ def add_to_map():
             if pos == portal2:
                 MAP[row_counter][field_counter] = "3"
 
-    with open("map.csv", "w") as f:
+    with open("map1.csv", "w") as f:
         for row in MAP:
             writer = csv.writer(f, delimiter=";")
             writer.writerow(row)
