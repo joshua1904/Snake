@@ -19,35 +19,31 @@ score = 0
 font = pygame.font.SysFont("comicsansms", 72)
 walls = list()
 
-snake_part_ew = pygame.image.load("pictures/textures/tail-ew.bmp")
-snake_part_ew = pygame.transform.scale(snake_part_ew, (30, 30))
-snake_part_ns = pygame.image.load("pictures/textures/tail-ns.bmp")
-snake_part_ns = pygame.transform.scale(snake_part_ns, (30, 30))
-snake_corner_se = pygame.image.load("pictures/textures/corner-se.bmp")
-snake_corner_se = pygame.transform.scale(snake_corner_se, (30, 30))
-snake_corner_sw = pygame.image.load("pictures/textures/corner-sw.bmp")
-snake_corner_sw = pygame.transform.scale(snake_corner_sw, (30, 30))
-snake_corner_nw = pygame.image.load("pictures/textures/corner-nw.bmp")
-snake_corner_nw = pygame.transform.scale(snake_corner_nw, (30, 30))
-snake_corner_ne = pygame.image.load("pictures/textures/corner-ne.bmp")
-snake_corner_ne = pygame.transform.scale(snake_corner_ne, (30, 30))
-snake_head_e = pygame.image.load("pictures/textures/head-e.bmp")
-snake_head_e = pygame.transform.scale(snake_head_e, (30, 30))
-snake_head_n = pygame.image.load("pictures/textures/head-n.bmp")
-snake_head_n = pygame.transform.scale(snake_head_n, (30, 30))
-snake_head_s = pygame.image.load("pictures/textures/head-s.bmp")
-snake_head_s = pygame.transform.scale(snake_head_s, (30, 30))
-snake_head_w = pygame.image.load("pictures/textures/head-w.bmp")
-snake_head_w = pygame.transform.scale(snake_head_w, (30, 30))
+
+# r right l left u up d down (snake move direction
+snake_part_rl = pygame.image.load("pictures/textures/tail-ew.bmp")
+snake_part_ud = pygame.image.load("pictures/textures/tail-ns.bmp")
+
+snake_corner_dr = pygame.image.load("pictures/textures/corner-se.bmp")
+snake_corner_dl = pygame.image.load("pictures/textures/corner-sw.bmp")
+snake_corner_ul = pygame.image.load("pictures/textures/corner-nw.bmp")
+snake_corner_ur = pygame.image.load("pictures/textures/corner-ne.bmp")
+
+snake_head_r = pygame.image.load("pictures/textures/head-e.bmp")
+snake_head_u = pygame.image.load("pictures/textures/head-n.bmp")
+snake_head_d = pygame.image.load("pictures/textures/head-s.bmp")
+snake_head_l = pygame.image.load("pictures/textures/head-w.bmp")
+
+snake_end_r = pygame.image.load("pictures/textures/head-e.bmp")
+snake_end_u = pygame.image.load("pictures/textures/head-n.bmp")
+snake_end_d = pygame.image.load("pictures/textures/head-s.bmp")
+snake_end_l = pygame.image.load("pictures/textures/head-w.bmp")
 
 wall_part = pygame.image.load("pictures/textures/wall.bmp")
-wall_part = pygame.transform.scale(wall_part, (30, 30))
 
 portal_image = pygame.image.load("pictures/textures/portal.bmp")
-portal_image = pygame.transform.scale(portal_image, (30, 30))
 
 sweet_image = pygame.image.load("pictures/textures/fruit.bmp")
-sweet_image = pygame.transform.scale(sweet_image, (30, 30))
 MAP = list()
 portal1 = tuple()
 portal2 = tuple()
@@ -220,72 +216,73 @@ def draw_picture(image, x, y):
 
 def draw_snake_head():
     if CURRENT_DIRECTION == "r":
-        draw_picture(snake_head_w, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_l, snake[-1][0], snake[-1][1])
         return
     if CURRENT_DIRECTION == "d":
-        draw_picture(snake_head_s, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_d, snake[-1][0], snake[-1][1])
         return
     if CURRENT_DIRECTION == "l":
-        draw_picture(snake_head_e, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_r, snake[-1][0], snake[-1][1])
         return
     if CURRENT_DIRECTION == "u":
-        draw_picture(snake_head_n, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_u, snake[-1][0], snake[-1][1])
         return
 
 
 def draw_snake_tail_part(x, y):
     global CURRENT_DIRECTION
-    if (x, y) not in corner_safe:
+    if position := (x, y) not in corner_safe:
         return
-    if corner_safe[(x, y)] == "r" or corner_safe[(x, y)] == "l":
-        draw_picture(snake_part_ew, x, y)
+    last_snake_piece = position == snake[0]
+    if corner_safe[position] == "r" or corner_safe[position] == "l":
+        draw_picture(snake_part_rl, x, y)
         return
-    if corner_safe[(x, y)] == "u" or corner_safe[(x, y)] == "d":
-        draw_picture(snake_part_ns, x, y)
+    if corner_safe[position] == "u" or corner_safe[position] == "d":
+        draw_picture(snake_part_ud, x, y)
         return
-    last_snake_piece = (x, y) == snake[0]
-    if corner_safe[(x, y)] == "rd":
+
+    if corner_safe[position] == "rd":
         if last_snake_piece:
-            draw_picture(snake_part_ns, x, y)
+            draw_picture(snake_part_ud, x, y)
         else:
-            draw_picture(snake_corner_se, x, y)
+            draw_picture(snake_corner_dr, x, y)
         return
-    if corner_safe[(x, y)] == "ul":
+    if corner_safe[position] == "ul":
         if last_snake_piece:
-            draw_picture(snake_part_ew, x, y)
+            draw_picture(snake_part_rl, x, y)
         else:
-            draw_picture(snake_corner_se, x, y)
+            draw_picture(snake_corner_dr, x, y)
         return
-    if corner_safe[(x, y)] == "dr":
+    if corner_safe[position] == "dr":
         if last_snake_piece:
-            draw_picture(snake_part_ew, x, y)
+            draw_picture(snake_part_rl, x, y)
         else:
-            draw_picture(snake_corner_nw, x, y)
-    if corner_safe[(x, y)] == "lu":
+            draw_picture(snake_corner_ul, x, y)
+    if corner_safe[position] == "lu":
         if last_snake_piece:
-            draw_picture(snake_part_ns, x, y)
+            draw_picture(snake_part_ud, x, y)
         else:
-            draw_picture(snake_corner_nw, x, y)
-    if corner_safe[(x, y)] == "ru":
+            draw_picture(snake_corner_ul, x, y)
+    if corner_safe[position] == "ru":
         if last_snake_piece:
-            draw_picture(snake_part_ns, x, y)
+            draw_picture(snake_part_ud, x, y)
         else:
-            draw_picture(snake_corner_ne, x, y)
-    if corner_safe[(x, y)] == "dl":
+            draw_picture(snake_corner_ur, x, y)
+    if corner_safe[position] == "dl":
         if last_snake_piece:
-            draw_picture(snake_part_ew, x, y)
+            draw_picture(snake_part_rl, x, y)
         else:
-            draw_picture(snake_corner_ne, x, y)
-    if corner_safe[(x, y)] == "ur":
+            draw_picture(snake_corner_ur, x, y)
+    if corner_safe[position] == "ur":
         if last_snake_piece:
-            draw_picture(snake_part_ew, x, y)
+            draw_picture(snake_part_rl, x, y)
         else:
-            draw_picture(snake_corner_sw, x, y)
-    if corner_safe[(x, y)] == "ld":
+            draw_picture(snake_corner_dl, x, y)
+    if corner_safe[position] == "ld":
         if last_snake_piece:
-            draw_picture(snake_part_ns, x, y)
+            draw_picture(snake_part_ud, x, y)
         else:
-            draw_picture(snake_corner_sw, x, y)
+            draw_picture(snake_corner_dl, x, y)
 
     keys_to_delete = [key for key in corner_safe.keys() if key not in snake]
     for i in keys_to_delete:
@@ -368,7 +365,7 @@ def intro():
     highscore_map_2 = utils.get_highscore("map2.csv")
     text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
     text_rect = text.get_rect(center=(1920 / 2, 100))
-    map1 = pygame.image.load("pictures/maps/ajz map.png")
+    map1 = pygame.image.load("pictures/maps/ajz_map.png")
     map1 = pygame.transform.scale(map1, (16 * 50, 9 * 50))
     map2 = pygame.image.load("pictures/maps/empty_map.png")
     map2 = pygame.transform.scale(map2, (16 * 50, 9 * 50))
