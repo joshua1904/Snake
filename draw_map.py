@@ -6,7 +6,7 @@ import csv
 
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1920, 1080))
+screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 walls = list()
@@ -16,7 +16,7 @@ SIZE = 30
 def draw_rect(x: int, y: int, color):
     pygame.draw.rect(screen, color, pygame.Rect(x * SIZE, y * SIZE, SIZE, SIZE))
 def get_map():
-    with open("map2.csv", "r") as f:
+    with open("map1.csv", "r") as f:
         return list(csv.reader(f, delimiter=";"))
 
 
@@ -70,7 +70,6 @@ def draw(pos: tuple, delete=False):
     global portal1, portal2
     grid_pos = (pos[0] // SIZE, pos[1] // SIZE)
     if not delete:
-        print(portal1, portal2)
         if not portal1:
             portal1 = grid_pos
             add_to_map()
@@ -79,8 +78,8 @@ def draw(pos: tuple, delete=False):
             portal2 = grid_pos
             add_to_map()
             return
-        walls.append(grid_pos)
-        add_to_map()
+        if grid_pos not in walls:
+            walls.append(grid_pos)
     else:
         if grid_pos == portal1:
             portal1 = None
@@ -91,7 +90,6 @@ def draw(pos: tuple, delete=False):
         if grid_pos in walls:
             walls.remove(grid_pos)
             removed_walls.append(grid_pos)
-            add_to_map()
 
 
 while running:
@@ -100,7 +98,7 @@ while running:
     for event in pygame.event.get():
         keys = pygame.key.get_pressed()
         mouse = pygame.mouse.get_pressed()
-        if event.type == pygame.QUIT:
+        if keys[pygame.K_DELETE]:
             running = False
         if mouse[0]:
             pos = pygame.mouse.get_pos()
@@ -117,3 +115,4 @@ while running:
 
     clock.tick(60)  # limits FPS to 60
 pygame.quit()
+add_to_map()

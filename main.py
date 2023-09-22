@@ -21,6 +21,10 @@ walls = list()
 
 eat_sound = pygame.mixer.Sound("sounds/eat_sound.wav")
 damage_sound = pygame.mixer.Sound("sounds/damage.wav")
+portal_sound = pygame.mixer.Sound("sounds/portal.wav")
+click_sound = pygame.mixer.Sound("sounds/click.wav")
+beat_highscore_sound = pygame.mixer.Sound("sounds/beat_highscore.wav")
+boost_sound = pygame.mixer.Sound("sounds/boost.wav")
 # r right l left u up d down (snake move direction
 snake_part_rl = pygame.image.load("pictures/textures/part_rl.bmp")
 snake_part_ud = pygame.image.load("pictures/textures/part_ud.bmp")
@@ -41,6 +45,7 @@ snake_end_d = pygame.image.load("pictures/textures/end_d.bmp")
 snake_end_l = pygame.image.load("pictures/textures/end_l.bmp")
 
 wall_part = pygame.image.load("pictures/textures/wall.bmp")
+
 
 portal_image = pygame.image.load("pictures/textures/portal.bmp")
 
@@ -85,19 +90,16 @@ def reset():
 
 def move(dir: str):
     if dir == "r":
-        running = move_right()
+        move_right()
     if dir == "u":
-        running = move_up()
+        move_up()
     if dir == "d":
-       running = move_down()
+       move_down()
     if dir == "l":
-        running = move_left()
-
-    if running:
-        if snake.count(snake[-1]) > 1 or walls.count(snake[-1]) > 1:
-            return False
-        return True
-    return False
+        move_left()
+    if snake.count(snake[-1]) > 1 or walls.count(snake[-1]) > 1:
+        return False
+    return True
 
 def draw_sweet():
     draw_picture(sweet_image, sweet[0], sweet[1])
@@ -112,98 +114,111 @@ def move_right():
     global CURRENT_DIRECTION
     dir_before_move = CURRENT_DIRECTION
     if CURRENT_DIRECTION == "l":
-        return move_left()
+        move_left()
+        return
     CURRENT_DIRECTION = "r"
     head = snake[len(snake) - 1]
     snake.pop(0)
 
     if head == portal1:
+        play_sound(portal_sound)
         snake.append((portal2[0] + 1, portal2[1]))
         safe_corner((portal2[0], portal2[1]), dir_before_move)
-        return True
+        return
     if head == portal2:
+        play_sound(portal_sound)
         snake.append((portal1[0] + 1, portal1[1]))
         safe_corner((portal1[0], portal1[1]), dir_before_move)
-        return True
+        return
     if (head_x := head[0]) != 1920 // SIZE - 1:
         snake.append((head_x + 1, head[1]))
         safe_corner((head_x, head[1]), dir_before_move)
-        return True
-    else: 
-        return False
+    else:
+        snake.append((0, head[1]))
+        safe_corner((0, head[1]))
 
 
 def move_left():
     global CURRENT_DIRECTION
     dir_before_move = CURRENT_DIRECTION
     if CURRENT_DIRECTION == "r":
-        return move_right()
+        move_right()
+        return
     CURRENT_DIRECTION = "l"
     head = snake[- 1]
     snake.pop(0)
 
     if head == portal1:
+        play_sound(portal_sound)
         snake.append((portal2[0] - 1, portal2[1]))
         safe_corner((portal2[0], portal2[1]), dir_before_move)
-        return True
+        return
     if head == portal2:
+        play_sound(portal_sound)
         snake.append((portal1[0] - 1, portal1[1]))
         safe_corner((portal1[0], portal1[1]), dir_before_move)
-        return True
+        return
     if (head_x := head[0]) != 0:
         snake.append((head_x - 1, head[1]))
         safe_corner((head_x, head[1]), dir_before_move)
-        return True
     else:
-        return False
+        snake.append((1920 // SIZE, head[1]))
+        safe_corner((1920 // SIZE, head[1]), dir_before_move)
+
 def move_down():
     global CURRENT_DIRECTION
     dir_before_move = CURRENT_DIRECTION
     if CURRENT_DIRECTION == "u":
-        return move_up()
+        move_up()
+        return
     CURRENT_DIRECTION = "d"
     head = snake[- 1]
     snake.pop(0)
 
     if head == portal1:
+        play_sound(portal_sound)
         snake.append((portal2[0], portal2[1] + 1))
         safe_corner((portal2[0], portal2[1]), dir_before_move)
-        return True
+        return
     if head == portal2:
+        play_sound(portal_sound)
         snake.append((portal1[0], portal1[1] + 1))
         safe_corner((portal1[0], portal1[1]), dir_before_move)
-        return True
+        return
     if (head_y := head[1]) != 1080 // SIZE - 1:
         snake.append((head[0], head_y + 1))
         safe_corner((head[0], head_y), dir_before_move)
-        return True
     else:
-        return False
+        snake.append((head[0], 0))
+        safe_corner((head[0], 0), dir_before_move)
+
 
 def move_up():
     global CURRENT_DIRECTION
     dir_before_move = CURRENT_DIRECTION
     if CURRENT_DIRECTION == "d":
-        return move_down()
+        move_down()
+        return
     CURRENT_DIRECTION = "u"
     head = snake[len(snake) - 1]
     snake.pop(0)
 
     if head == portal1:
+        play_sound(portal_sound)
         snake.append((portal2[0], portal2[1] -1))
         safe_corner((portal2[0], portal2[1]), dir_before_move)
-        return True
+        return
     if head == portal2:
+        play_sound(portal_sound)
         snake.append((portal1[0], portal1[1] - 1))
         safe_corner((portal1[0], portal1[1]), dir_before_move)
-        return True
+        return
     if (head_y := head[1]) != 0:
         snake.append((head[0], head_y - 1))
         safe_corner((head[0], head_y), dir_before_move)
-        return True
     else:
-        return False
-
+        snake.append((head[0], 1080 // SIZE))
+        safe_corner((head[0], 1080 // SIZE), dir_before_move)
 def add_body_part():
     global CURRENT_DIRECTION
     snake.append(sweet)
@@ -289,6 +304,7 @@ def play_sound(sound):
     pygame.mixer.Sound.play(sound)
     pygame.mixer.music.stop()
 def game_loop(map_str):
+    highscore_set = False
     global running
     global alive
     global wanted_direction
@@ -298,6 +314,7 @@ def game_loop(map_str):
     init(map_str)
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
+    speed_count = 0
     while running:
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
@@ -333,6 +350,9 @@ def game_loop(map_str):
                 sweet = utils.spawn_sweet(SIZE, snake, walls)
                 if score > highscore:
                     highscore = score
+                    if not highscore_set:
+                        play_sound(beat_highscore_sound)
+                        highscore_set = True
 
             draw_score(score, highscore)
             # flip() the display to put your work on screen
@@ -343,10 +363,26 @@ def game_loop(map_str):
                 utils.set_highscore(map_str, highscore)
             return
         if speed:
+            if speed_count % 10 == 0:
+                play_sound(boost_sound)
             clock.tick(20)
+            speed_count += 1
         else:
             clock.tick(10)  # limits FPS to 60
+            speed_count = 0
 
+def draw_mini_map(map_name, start_pos):
+    mini_size = 10
+    map = utils.get_map(map_name)
+    my_walls = list()
+    utils.spawn_walls(my_walls, map)
+    wall_part_mini = pygame.transform.scale(wall_part, (mini_size, mini_size))
+    portal_image_mini = pygame.transform.scale(portal_image, (mini_size, mini_size))
+    portal1, portal2 = utils.spawn_portal(map)
+    for row_count, row in enumerate(my_walls):
+        screen.blit(wall_part_mini, (start_pos[0] + row[0] * mini_size, start_pos[1] + row[1] * mini_size))
+    screen.blit(portal_image_mini, (start_pos[0] + portal1[0] * mini_size, start_pos[1] + portal1[1] * mini_size))
+    screen.blit(portal_image_mini, (start_pos[0] + portal2[0] * mini_size, start_pos[1] + portal2[1] * mini_size))
 def intro():
     global screen
     global font
@@ -355,38 +391,32 @@ def intro():
     highscore_map_2 = utils.get_highscore("map2.csv")
     text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
     text_rect = text.get_rect(center=(1920 / 2, 100))
-    map1 = pygame.image.load("pictures/maps/ajz_map.png")
-    map1 = pygame.transform.scale(map1, (16 * 50, 9 * 50))
-    map2 = pygame.image.load("pictures/maps/empty_map.png")
-    map2 = pygame.transform.scale(map2, (16 * 50, 9 * 50))
-    map1_rect = map1.get_rect()
-    map2_rect = map2.get_rect()
-    map1_rect.center = (1920 // 4, 1080 // 2)
-    map2_rect.center = (3 * 1920 // 4, 1080 // 2)
-    map1_text = font.render(f"(1) Highscore: {highscore_map_1}", True, "black")
-    map2_text = font.render(f"(2)Highscore: {highscore_map_2}", True, "black")
+    map1_text = font.render(f"(1) Highscore: {highscore_map_1}", True, "white")
+    map2_text = font.render(f"(2)Highscore: {highscore_map_2}", True, "white")
     map1_text_rect = map1_text.get_rect()
     map2_text_rect = map2_text.get_rect()
-    map1_text_rect.midtop = (map1_rect.centerx, map1_rect.bottom + 10)
-    map2_text_rect.midtop = (map2_rect.centerx, map2_rect.bottom + 10)
+    map1_text_rect.center = (520, 780)
+    map2_text_rect.center = (1400, 780)
     while intro:
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if keys[pygame.K_1]:
+                play_sound(click_sound)
                 return "map1.csv"
             if keys[pygame.K_2]:
+                play_sound(click_sound)
                 return "map2.csv"
             if keys[pygame.K_DELETE]:
                 return
-        screen.fill("white")
+        screen.fill("black")
         if blink_count < 10:
             text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
         else:
             text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "red")
         screen.blit(text,
                     text_rect)
-        screen.blit(map1, map1_rect)
-        screen.blit(map2, map2_rect)
+        draw_mini_map("map1.csv", (200, 360))
+        draw_mini_map("map1.csv", (1080, 360))
         screen.blit(map1_text, map1_text_rect)
         screen.blit(map2_text, map2_text_rect)
         pygame.display.update()
