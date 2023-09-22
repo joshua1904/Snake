@@ -19,7 +19,8 @@ score = 0
 font = pygame.font.SysFont("comicsansms", 72)
 walls = list()
 
-
+eat_sound = pygame.mixer.Sound("sounds/eat_sound.wav")
+damage_sound = pygame.mixer.Sound("sounds/damage.wav")
 # r right l left u up d down (snake move direction
 snake_part_rl = pygame.image.load("pictures/textures/part_rl.bmp")
 snake_part_ud = pygame.image.load("pictures/textures/part_ud.bmp")
@@ -284,6 +285,9 @@ def draw_rects():
     draw_picture(portal_image, portal1[0], portal1[1])
     draw_picture(portal_image, portal2[0], portal2[1])
 
+def play_sound(sound):
+    pygame.mixer.Sound.play(sound)
+    pygame.mixer.music.stop()
 def game_loop(map_str):
     global running
     global alive
@@ -323,6 +327,7 @@ def game_loop(map_str):
             draw_rects()
             draw_sweet()
             if check_sweet():
+                play_sound(eat_sound)
                 score += 1
                 add_body_part()
                 sweet = utils.spawn_sweet(SIZE, snake, walls)
@@ -333,6 +338,7 @@ def game_loop(map_str):
             # flip() the display to put your work on screen
             pygame.display.flip()
         else:
+            play_sound(damage_sound)
             if highscore > current_highscore:
                 utils.set_highscore(map_str, highscore)
             return
