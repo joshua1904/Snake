@@ -21,23 +21,23 @@ walls = list()
 
 
 # r right l left u up d down (snake move direction
-snake_part_rl = pygame.image.load("pictures/textures/tail-ew.bmp")
-snake_part_ud = pygame.image.load("pictures/textures/tail-ns.bmp")
+snake_part_rl = pygame.image.load("pictures/textures/part_rl.bmp")
+snake_part_ud = pygame.image.load("pictures/textures/part_ud.bmp")
 
-snake_corner_dr = pygame.image.load("pictures/textures/corner-se.bmp")
-snake_corner_dl = pygame.image.load("pictures/textures/corner-sw.bmp")
-snake_corner_ul = pygame.image.load("pictures/textures/corner-nw.bmp")
-snake_corner_ur = pygame.image.load("pictures/textures/corner-ne.bmp")
+snake_corner_dr = pygame.image.load("pictures/textures/corner_dr.bmp")
+snake_corner_dl = pygame.image.load("pictures/textures/corner_dl.bmp")
+snake_corner_ur = pygame.image.load("pictures/textures/corner_ur.bmp")
+snake_corner_ul = pygame.image.load("pictures/textures/corner_ul.bmp")
 
-snake_head_r = pygame.image.load("pictures/textures/head-e.bmp")
-snake_head_u = pygame.image.load("pictures/textures/head-n.bmp")
-snake_head_d = pygame.image.load("pictures/textures/head-s.bmp")
-snake_head_l = pygame.image.load("pictures/textures/head-w.bmp")
+snake_head_r = pygame.image.load("pictures/textures/head_r.bmp")
+snake_head_u = pygame.image.load("pictures/textures/head_u.bmp")
+snake_head_d = pygame.image.load("pictures/textures/head_d.bmp")
+snake_head_l = pygame.image.load("pictures/textures/head_l.bmp")
 
-snake_end_r = pygame.image.load("pictures/textures/head-e.bmp")
-snake_end_u = pygame.image.load("pictures/textures/head-n.bmp")
-snake_end_d = pygame.image.load("pictures/textures/head-s.bmp")
-snake_end_l = pygame.image.load("pictures/textures/head-w.bmp")
+snake_end_r = pygame.image.load("pictures/textures/end_r.bmp")
+snake_end_u = pygame.image.load("pictures/textures/end_u.bmp")
+snake_end_d = pygame.image.load("pictures/textures/end_d.bmp")
+snake_end_l = pygame.image.load("pictures/textures/end_l.bmp")
 
 wall_part = pygame.image.load("pictures/textures/wall.bmp")
 
