@@ -231,58 +231,42 @@ def draw_snake_head():
 
 def draw_snake_tail_part(x, y):
     global CURRENT_DIRECTION
-    if position := (x, y) not in corner_safe:
+    if (position := (x, y)) not in corner_safe:
         return
+    rotation = corner_safe[position]
     last_snake_piece = position == snake[0]
-    if corner_safe[position] == "r" or corner_safe[position] == "l":
+    if last_snake_piece:
+        #SORRY :( ber der code spart ein paat if abfragen weil man jetzt nur aufs ende von der rotation schauen muss
+        if len(rotation) < 1:
+            r = rotation[1]
+        if rotation == "r" :
+            draw_picture(snake_end_r, x, y)
+            return
+        if rotation == "l":
+            draw_picture(snake_end_l, x, y)
+            return
+        if rotation == "u":
+            draw_picture(snake_end_u, x, y)
+            return
+        if rotation == "d":
+            draw_picture(snake_end_d, x, y)
+            return
+        return
+    if rotation == "r" or rotation == "l":
         draw_picture(snake_part_rl, x, y)
         return
-    if corner_safe[position] == "u" or corner_safe[position] == "d":
+    if rotation == "u" or rotation == "d":
         draw_picture(snake_part_ud, x, y)
         return
-
-    if corner_safe[position] == "rd":
-        if last_snake_piece:
-            draw_picture(snake_part_ud, x, y)
-        else:
-            draw_picture(snake_corner_dr, x, y)
+    if rotation == "rd" or rotation == "ul":
+        draw_picture(snake_corner_dr, x, y)
         return
-    if corner_safe[position] == "ul":
-        if last_snake_piece:
-            draw_picture(snake_part_rl, x, y)
-        else:
-            draw_picture(snake_corner_dr, x, y)
-        return
-    if corner_safe[position] == "dr":
-        if last_snake_piece:
-            draw_picture(snake_part_rl, x, y)
-        else:
-            draw_picture(snake_corner_ul, x, y)
-    if corner_safe[position] == "lu":
-        if last_snake_piece:
-            draw_picture(snake_part_ud, x, y)
-        else:
-            draw_picture(snake_corner_ul, x, y)
-    if corner_safe[position] == "ru":
-        if last_snake_piece:
-            draw_picture(snake_part_ud, x, y)
-        else:
-            draw_picture(snake_corner_ur, x, y)
-    if corner_safe[position] == "dl":
-        if last_snake_piece:
-            draw_picture(snake_part_rl, x, y)
-        else:
-            draw_picture(snake_corner_ur, x, y)
-    if corner_safe[position] == "ur":
-        if last_snake_piece:
-            draw_picture(snake_part_rl, x, y)
-        else:
-            draw_picture(snake_corner_dl, x, y)
-    if corner_safe[position] == "ld":
-        if last_snake_piece:
-            draw_picture(snake_part_ud, x, y)
-        else:
-            draw_picture(snake_corner_dl, x, y)
+    if rotation == "dr" or rotation == "lu":
+        draw_picture(snake_corner_ul, x, y)
+    if rotation == "ru" or rotation == "dl":
+        draw_picture(snake_corner_ur, x, y)
+    if rotation == "ur" or rotation == "ld":
+        draw_picture(snake_corner_dl, x, y)
 
     keys_to_delete = [key for key in corner_safe.keys() if key not in snake]
     for i in keys_to_delete:
