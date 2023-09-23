@@ -18,6 +18,7 @@ alive = True
 score = 0
 font = pygame.font.SysFont("comicsansms", 72)
 walls = list()
+score_screen_update_rect = None
 
 eat_sound = pygame.mixer.Sound("sounds/eat_sound.wav")
 damage_sound = pygame.mixer.Sound("sounds/damage.wav")
@@ -72,9 +73,11 @@ def init(map_str):
 
 
 def draw_score(points: int, highscore: int):
+    global score_screen_update_rect
     text = font.render(f"{points} HIGSCORE: {highscore}", True, "blue")
     screen.blit(text,
                 (0, 0))
+    score_screen_update_rect = text.get_rect()
 
 def reset():
     global snake
@@ -315,6 +318,24 @@ def game_loop(map_str):
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+    add_body_part()
+
+    screen.fill("black")
+    draw_rects()
+    draw_sweet()
+    pygame.display.flip()
+
     while running:
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
@@ -356,7 +377,10 @@ def game_loop(map_str):
 
             draw_score(score, highscore)
             # flip() the display to put your work on screen
-            pygame.display.flip()
+            # print((snake[-1][0] * SIZE, snake[-1][1] * SIZE, 30, 30))
+            # pygame.display.flip()
+            pygame.display.update([(snake[-1][0] * (SIZE - 1), snake[-1][1] * (SIZE - 1), 3 * SIZE, 3 * SIZE),
+                                   (snake[0][0] * (SIZE - 1), snake[0][1] * (SIZE - 1), 3 * SIZE, 3 * SIZE)])
         else:
             play_sound(damage_sound)
             if highscore > current_highscore:
