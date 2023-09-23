@@ -106,6 +106,9 @@ def move(dir: str):
 
 def draw_sweet():
     draw_picture(sweet_image, sweet[0], sweet[1])
+    pygame.display.update([
+        (sweet[0] * SIZE, sweet[1] * SIZE, SIZE, SIZE)
+    ])
 
 def safe_corner(pos, dir_before_move: str):
     global CURRENT_DIRECTION
@@ -379,8 +382,10 @@ def game_loop(map_str):
             # flip() the display to put your work on screen
             # print((snake[-1][0] * SIZE, snake[-1][1] * SIZE, 30, 30))
             # pygame.display.flip()
-            pygame.display.update([(snake[-1][0] * (SIZE - 1), snake[-1][1] * (SIZE - 1), 3 * SIZE, 3 * SIZE),
-                                   (snake[0][0] * (SIZE - 1), snake[0][1] * (SIZE - 1), 3 * SIZE, 3 * SIZE)])
+            pygame.display.update([
+                ((snake[-1][0] - 1) * SIZE, (snake[-1][1] - 1) * SIZE, 3 * SIZE, 3 * SIZE),
+                ((snake[0][0] - 1) * SIZE, (snake[0][1] - 1) * SIZE, 3 * SIZE, 3 * SIZE)
+            ])
         else:
             play_sound(damage_sound)
             if highscore > current_highscore:
