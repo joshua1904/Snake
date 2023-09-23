@@ -107,7 +107,7 @@ def draw_sweet():
     draw_picture(sweet_image, sweet[0], sweet[1])
     pygame.display.update((sweet[0] * SIZE, sweet[1] * SIZE, SIZE, SIZE))
 
-def safe_corner(pos, dir_before_move: str):
+def save_corner(pos, dir_before_move: str):
     global CURRENT_DIRECTION
     if dir_before_move != CURRENT_DIRECTION:
         corner_safe[pos] = f"{dir_before_move}{CURRENT_DIRECTION}"
@@ -126,19 +126,19 @@ def move_right():
     if head == portal1:
         play_sound(portal_sound)
         snake.append((portal2[0] + 1, portal2[1]))
-        safe_corner((portal2[0], portal2[1]), dir_before_move)
+        save_corner((portal2[0], portal2[1]), dir_before_move)
         return
     if head == portal2:
         play_sound(portal_sound)
         snake.append((portal1[0] + 1, portal1[1]))
-        safe_corner((portal1[0], portal1[1]), dir_before_move)
+        save_corner((portal1[0], portal1[1]), dir_before_move)
         return
     if (head_x := head[0]) != 1920 // SIZE - 1:
         snake.append((head_x + 1, head[1]))
-        safe_corner((head_x, head[1]), dir_before_move)
+        save_corner((head_x, head[1]), dir_before_move)
     else:
         snake.append((0, head[1]))
-        safe_corner((0, head[1]))
+        save_corner((0, head[1]))
 
 
 def move_left():
@@ -148,25 +148,25 @@ def move_left():
         move_right()
         return
     CURRENT_DIRECTION = "l"
-    head = snake[- 1]
+    head = snake[-1]
     snake.pop(0)
 
     if head == portal1:
         play_sound(portal_sound)
         snake.append((portal2[0] - 1, portal2[1]))
-        safe_corner((portal2[0], portal2[1]), dir_before_move)
+        save_corner((portal2[0], portal2[1]), dir_before_move)
         return
     if head == portal2:
         play_sound(portal_sound)
         snake.append((portal1[0] - 1, portal1[1]))
-        safe_corner((portal1[0], portal1[1]), dir_before_move)
+        save_corner((portal1[0], portal1[1]), dir_before_move)
         return
     if (head_x := head[0]) != 0:
         snake.append((head_x - 1, head[1]))
-        safe_corner((head_x, head[1]), dir_before_move)
+        save_corner((head_x, head[1]), dir_before_move)
     else:
         snake.append((1920 // SIZE, head[1]))
-        safe_corner((1920 // SIZE, head[1]), dir_before_move)
+        save_corner((1920 // SIZE, head[1]), dir_before_move)
 
 def move_down():
     global CURRENT_DIRECTION
@@ -175,25 +175,25 @@ def move_down():
         move_up()
         return
     CURRENT_DIRECTION = "d"
-    head = snake[- 1]
+    head = snake[-1]
     snake.pop(0)
 
     if head == portal1:
         play_sound(portal_sound)
         snake.append((portal2[0], portal2[1] + 1))
-        safe_corner((portal2[0], portal2[1]), dir_before_move)
+        save_corner((portal2[0], portal2[1]), dir_before_move)
         return
     if head == portal2:
         play_sound(portal_sound)
         snake.append((portal1[0], portal1[1] + 1))
-        safe_corner((portal1[0], portal1[1]), dir_before_move)
+        save_corner((portal1[0], portal1[1]), dir_before_move)
         return
     if (head_y := head[1]) != 1080 // SIZE - 1:
         snake.append((head[0], head_y + 1))
-        safe_corner((head[0], head_y), dir_before_move)
+        save_corner((head[0], head_y), dir_before_move)
     else:
         snake.append((head[0], 0))
-        safe_corner((head[0], 0), dir_before_move)
+        save_corner((head[0], 0), dir_before_move)
 
 
 def move_up():
@@ -203,32 +203,32 @@ def move_up():
         move_down()
         return
     CURRENT_DIRECTION = "u"
-    head = snake[len(snake) - 1]
+    head = snake[-1]
     snake.pop(0)
 
     if head == portal1:
         play_sound(portal_sound)
         snake.append((portal2[0], portal2[1] -1))
-        safe_corner((portal2[0], portal2[1]), dir_before_move)
+        save_corner((portal2[0], portal2[1]), dir_before_move)
         return
     if head == portal2:
         play_sound(portal_sound)
         snake.append((portal1[0], portal1[1] - 1))
-        safe_corner((portal1[0], portal1[1]), dir_before_move)
+        save_corner((portal1[0], portal1[1]), dir_before_move)
         return
     if (head_y := head[1]) != 0:
         snake.append((head[0], head_y - 1))
-        safe_corner((head[0], head_y), dir_before_move)
+        save_corner((head[0], head_y), dir_before_move)
     else:
         snake.append((head[0], 1080 // SIZE))
-        safe_corner((head[0], 1080 // SIZE), dir_before_move)
+        save_corner((head[0], 1080 // SIZE), dir_before_move)
 def add_body_part():
     global CURRENT_DIRECTION
     snake.append(sweet)
 
 
 def check_sweet() -> bool:
-    return snake[len(snake) - 1] == sweet
+    return snake[-1] == sweet
 
 def draw_picture(image, x, y):
     screen.blit(image, (x * SIZE, y * SIZE))
@@ -240,16 +240,16 @@ def draw_black(x, y):
 
 def draw_snake_head():
     if CURRENT_DIRECTION == "r":
-        draw_picture(snake_head_l, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_l, snake[-2][0], snake[-2][1])
         return
     if CURRENT_DIRECTION == "d":
-        draw_picture(snake_head_d, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_d, snake[-2][0], snake[-2][1])
         return
     if CURRENT_DIRECTION == "l":
-        draw_picture(snake_head_r, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_r, snake[-2][0], snake[-2][1])
         return
     if CURRENT_DIRECTION == "u":
-        draw_picture(snake_head_u, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_u, snake[-2][0], snake[-2][1])
         return
 
 
@@ -266,18 +266,25 @@ def draw_old_tail_black(x, y, rotation):
             draw_black(x, y - 1)
 
 def draw_snake_tail_part(x, y):
-    global CURRENT_DIRECTION
     if (position := (x, y)) not in corner_safe:
         return
     rotation = corner_safe[position]
+    second_snake_piece = position == snake[-2]
     last_snake_piece = position == snake[0]
-    if last_snake_piece:
 
+    if second_snake_piece:
+        match rotation[-1]:
+            case "r":             # rotation in ("r" "ur" "dr")
+                draw_picture(snake_head_l, x, y)
+            case "l":
+                draw_picture(snake_head_r, x, y)
+            case "u":
+                draw_picture(snake_head_u, x, y)
+            case "d":
+                draw_picture(snake_head_d, x, y)
+
+    elif last_snake_piece:
         #SORRY :( ber der code spart ein paat if abfragen weil man jetzt nur aufs ende von der rotation schauen muss
-        if len(rotation) < 1:
-            r = rotation[1]
-        draw_old_tail_black(x, y, rotation)
-
         match rotation[-1]:
             case "r":             # rotation in ("r" "ur" "dr")
                 draw_picture(snake_end_r, x, y)
@@ -287,6 +294,7 @@ def draw_snake_tail_part(x, y):
                 draw_picture(snake_end_u, x, y)
             case "d":
                 draw_picture(snake_end_d, x, y)
+        draw_old_tail_black(x, y, rotation)
     else:
         match rotation:
             case "r" | "l":
@@ -311,7 +319,7 @@ def draw_snake_tail():
         draw_snake_tail_part(row[0], row[1])
 
 def draw_snake():
-    draw_snake_head()
+    # draw_snake_head()
     draw_snake_tail()
     # update only 3x3 around head and tail
     pygame.display.update([
@@ -319,11 +327,11 @@ def draw_snake():
         ((snake[0][0] - 1) * SIZE, (snake[0][1] - 1) * SIZE, 3 * SIZE, 3 * SIZE)
     ])
 
-def draw_rects():
-    # draw_snake_tail()
-    # draw_snake_head()
+def draw_walls():
     for row_count, row in enumerate(walls):
         draw_picture(wall_part, row[0], row[1])
+
+def draw_portals():
     draw_picture(portal_image, portal1[0], portal1[1])
     draw_picture(portal_image, portal2[0], portal2[1])
 
@@ -333,7 +341,8 @@ def play_sound(sound):
 
 def draw_init_screen(highscore):
     screen.fill("black")
-    draw_rects()
+    draw_walls()
+    draw_portals()
     #draw_score(score, highscore)
     draw_sweet()
     pygame.display.update()
@@ -350,18 +359,18 @@ def game_loop(map_str):
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
-    add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
+    # add_body_part()
 
     # init screen
     draw_init_screen(highscore)
@@ -390,10 +399,7 @@ def game_loop(map_str):
         # move_right()
         # fill the screen with a color to wipe away anything from last frame
         if alive:
-            # screen.fill("black")
             alive = move(wanted_direction)
-            #draw_rects()
-            #draw_sweet()
             draw_snake()
 
             if check_sweet():
