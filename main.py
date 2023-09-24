@@ -1,4 +1,6 @@
 # Example file showing a basic pygame "game loop"
+import collections
+
 import pygame
 import utils
 
@@ -88,15 +90,16 @@ def reset():
     return True
 
 
-def move(dir: str):
-    if dir == "r":
-        move_right()
-    if dir == "u":
-        move_up()
-    if dir == "d":
-       move_down()
-    if dir == "l":
-        move_left()
+def move(direction: str):
+    match direction:
+        case "r":
+            move_right()
+        case "u":
+            move_up()
+        case "d":
+            move_down()
+        case "l":
+            move_left()
     if snake.count(snake[-1]) > 1 or walls.count(snake[-1]) > 1:
         return False
     return True
@@ -312,28 +315,44 @@ def game_loop(map_str):
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
+    last_direction = CURRENT_DIRECTION
+
+    # nur bestimmte events speichern (Mausbewegung zb ausschließen)
+    pygame.event.set_allowed((pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP))
+    pressed_direction_keys_queue = collections.deque(list())
+
     while running:
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
-            keys = pygame.key.get_pressed()
-            speed = keys[pygame.K_SPACE]
-            if keys[pygame.K_HASH]:
-                alive = reset()
-            if keys[pygame.K_LEFT]:
-                wanted_direction = "l"
-                break
-            if keys[pygame.K_RIGHT]:
-                wanted_direction = "r"
-                break
-            if keys[pygame.K_UP]:
-                wanted_direction = "u"
-                break
-            if keys[pygame.K_DOWN]:
-                wanted_direction = "d"
-                break
+            match event.type:
+                case pygame.KEYDOWN:
+                    match event.key:
+                        case pygame.K_HASH:
+                            alive = reset()
+                        case pygame.K_SPACE:
+                            speed = True
+                        case pygame.K_LEFT:
+                            pressed_direction_keys_queue.append("l")
+                        case pygame.K_RIGHT:
+                            pressed_direction_keys_queue.append("r")
+                        case pygame.K_UP:
+                            pressed_direction_keys_queue.append("u")
+                        case pygame.K_DOWN:
+                            pressed_direction_keys_queue.append("d")
+                case pygame.KEYUP:
+                    match event.key:
+                        case pygame.K_SPACE:
+                            speed = False
 
-        alive = move(wanted_direction)
+        if not pressed_direction_keys_queue:
+            alive = move(CURRENT_DIRECTION)
+            last_direction = CURRENT_DIRECTION
+        else:
+            wanted_direction = pressed_direction_keys_queue.popleft()
+            if wanted_direction != last_direction:
+                alive = move(wanted_direction)
+            last_direction = wanted_direction
 
         if alive:
             # fill the screen with a color to wipe away anything from last frame
