@@ -141,7 +141,7 @@ def move_right():
         save_corner((head_x, head[1]), dir_before_move)
     else:
         snake.append((0, head[1]))
-        save_corner((0, head[1]))
+        save_corner((0, head[1]), dir_before_move)
 
 
 def move_left():
@@ -349,6 +349,7 @@ def game_loop(map_str):
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
+    speed = False
     last_direction = CURRENT_DIRECTION
     # add_body_part()
     # add_body_part()
