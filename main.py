@@ -350,10 +350,12 @@ def game_loop(map_str):
             alive = move(CURRENT_DIRECTION)
             last_direction = CURRENT_DIRECTION
         else:
-            wanted_direction = pressed_direction_keys_queue.popleft()
-            if wanted_direction != last_direction:
-                alive = move(wanted_direction)
-            last_direction = wanted_direction
+            while pressed_direction_keys_queue:         # filter consecutive same directions like 'r', 'r', 'r'
+                wanted_direction = pressed_direction_keys_queue.popleft()
+                if wanted_direction != last_direction:
+                    last_direction = wanted_direction
+                    break
+            alive = move(wanted_direction)
 
         if alive:
             # fill the screen with a color to wipe away anything from last frame
