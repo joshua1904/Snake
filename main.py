@@ -315,6 +315,7 @@ def game_loop(map_str):
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
+    speed = False
     last_direction = CURRENT_DIRECTION
 
     # nur bestimmte events speichern (Mausbewegung zb ausschließen)
