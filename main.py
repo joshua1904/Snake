@@ -68,7 +68,7 @@ def init(map_str):
     wanted_direction = "r"
     snake = [(10, 1), (11, 1)]
     corner_save = {(10, 1): "r", (11, 1): "r"}
-    sweet = utils.spawn_sweet(SIZE, snake, walls)
+    sweet = utils.spawn_sweet(SIZE, snake, walls, (portal1, portal2))
     alive = True
     running = True
 
@@ -369,7 +369,7 @@ def game_loop(map_str):
                 play_sound(eat_sound)
                 score += 1
                 add_body_part()
-                sweet = utils.spawn_sweet(SIZE, snake, walls)
+                sweet = utils.spawn_sweet(SIZE, snake, walls, (portal1, portal2))
                 if score > highscore:
                     highscore = score
                     if not highscore_set:

@@ -20,13 +20,13 @@ def spawn_walls(walls: list, MAP: list):
             if field == "1":
                 walls.append((field_counter, row_counter))
 
-def spawn_sweet(SIZE, snake, walls):
+def spawn_sweet(SIZE, snake, walls, portals):
     sweet_x = random.randint(1, 1910 // SIZE)
     sweet_y = random.randint(1, 1070 // SIZE)
-    if (sweet_xy := (sweet_x, sweet_y)) not in snake and sweet_xy not in walls:
+    if (sweet_xy := (sweet_x, sweet_y)) not in snake and sweet_xy not in walls and sweet_xy not in (portals[0], portals[1]):
         return sweet_xy
     else:
-        return spawn_sweet(SIZE, snake, walls)
+        return spawn_sweet(SIZE, snake, walls, portals)
 
 def set_highscore(map_str, score):
     highscore_json = get_json()
