@@ -7,6 +7,7 @@ import utils
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+map_surface = screen.copy()
 clock = pygame.time.Clock()
 running = True
 SIZE = 30
@@ -64,6 +65,7 @@ def init(map_str):
     utils.spawn_walls(walls, MAP)
     portal1, portal2 = utils.spawn_portal(MAP)
     utils.spawn_walls(walls, MAP)
+    init_map_surface()
     CURRENT_DIRECTION = "r"
     wanted_direction = "r"
     snake = [(10, 1), (11, 1)]
@@ -72,6 +74,13 @@ def init(map_str):
     alive = True
     running = True
 
+def init_map_surface():
+    global map_surface
+    map_surface.fill("black")
+    for wall in walls:
+        draw_picture(wall_part, wall[0], wall[1], surface=map_surface)
+    draw_picture(portal_image, portal1[0], portal1[1], surface=map_surface)
+    draw_picture(portal_image, portal2[0], portal2[1], surface=map_surface)
 
 def draw_score(points: int, highscore: int):
     text = font.render(f"{points} HIGSCORE: {highscore}", True, "blue")
@@ -230,8 +239,9 @@ def add_body_part():
 def check_sweet() -> bool:
     return snake[-1] == sweet
 
-def draw_picture(image, x, y):
-    screen.blit(image, (x * SIZE, y * SIZE))
+def draw_picture(image, x, y, surface=None):
+    base_surface = surface if surface else screen
+    base_surface.blit(image, (x * SIZE, y * SIZE))
 
 def draw_snake_head():
     if CURRENT_DIRECTION == "r":
@@ -292,13 +302,8 @@ def draw_snake():
     draw_snake_head()
     draw_snake_tail()
 
-def draw_walls():
-    for row_count, row in enumerate(walls):
-        draw_picture(wall_part, row[0], row[1])
-
-def draw_portals():
-    draw_picture(portal_image, portal1[0], portal1[1])
-    draw_picture(portal_image, portal2[0], portal2[1])
+def draw_map():
+    screen.blit(map_surface, (0, 0))
 
 def play_sound(sound):
     pygame.mixer.Sound.play(sound)
@@ -357,9 +362,7 @@ def game_loop(map_str):
 
         if alive:
             # fill the screen with a color to wipe away anything from last frame
-            screen.fill("black")
-            draw_walls()
-            draw_portals()
+            draw_map()
             draw_sweet()
             draw_snake()
 
