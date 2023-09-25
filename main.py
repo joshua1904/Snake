@@ -12,8 +12,8 @@ clock = pygame.time.Clock()
 running = True
 SIZE = 30
 snake = list()
-#safes direction changes of the snake
-corner_safe = dict()
+#saves direction changes of the snake
+corner_save = dict()
 speed = False
 CURRENT_DIRECTION = "r"
 wanted_direction = "r"
@@ -59,7 +59,7 @@ portal2 = tuple()
 sweet = tuple()
 
 def init(map_str):
-    global portal1, portal2, sweet, snake, CURRENT_DIRECTION, wanted_direction, alive, running, MAP, corner_safe
+    global portal1, portal2, sweet, snake, CURRENT_DIRECTION, wanted_direction, alive, running, MAP, corner_save
     walls.clear()
     MAP = utils.get_map(map_str)
     utils.spawn_walls(walls, MAP)
@@ -68,7 +68,7 @@ def init(map_str):
     CURRENT_DIRECTION = "r"
     wanted_direction = "r"
     snake = [(10, 1), (11, 1)]
-    corner_safe = {(10, 1): "r", (11, 1): "r"}
+    corner_save = {(10, 1): "r", (11, 1): "r"}
     sweet = utils.spawn_sweet(SIZE, snake, walls)
     alive = True
     running = True
@@ -113,9 +113,9 @@ def draw_sweet():
 def save_corner(pos, dir_before_move: str):
     global CURRENT_DIRECTION
     if dir_before_move != CURRENT_DIRECTION:
-        corner_safe[pos] = f"{dir_before_move}{CURRENT_DIRECTION}"
+        corner_save[pos] = f"{dir_before_move}{CURRENT_DIRECTION}"
     else:
-        corner_safe[pos] = CURRENT_DIRECTION
+        corner_save[pos] = CURRENT_DIRECTION
 def move_right():
     global CURRENT_DIRECTION
     dir_before_move = CURRENT_DIRECTION
@@ -268,9 +268,9 @@ def draw_old_tail_black(x, y, rotation):
             draw_black(x, y - 1)
 
 def draw_snake_tail_part(x, y):
-    if (position := (x, y)) not in corner_safe:
+    if (position := (x, y)) not in corner_save:
         return
-    rotation = corner_safe[position]
+    rotation = corner_save[position]
     last_snake_piece = position == snake[0]
 
     if last_snake_piece:
@@ -300,9 +300,9 @@ def draw_snake_tail_part(x, y):
             case "ur" | "ld":
                 draw_picture(snake_corner_dl, x, y)
 
-    keys_to_delete = [key for key in corner_safe.keys() if key not in snake]
+    keys_to_delete = [key for key in corner_save.keys() if key not in snake]
     for i in keys_to_delete:
-        corner_safe.pop(i)
+        corner_save.pop(i)
 
 def draw_snake_tail():
     for row_count, row in enumerate(snake):
