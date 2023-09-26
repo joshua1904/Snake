@@ -1,6 +1,10 @@
 import csv
 import random
 import json
+
+import pygame
+
+
 def get_map(map_name):
     with open(map_name, "r") as f:
         return list(csv.reader(f, delimiter=";"))
@@ -44,3 +48,15 @@ def get_json():
         return json.load(f)
 set_highscore("test", 1)
 #print(get_highscore("map1.csv"))
+
+
+def init_background(image: pygame.image, surface: pygame.Surface, size=(360, 360), darker=90) -> pygame.Surface:
+    """Generate Background-Imgae"""
+    scaled_image = pygame.transform.smoothscale(image, size)
+    scaled_image.fill((darker, darker, darker), special_flags=pygame.BLEND_RGB_SUB)
+    surface_size = surface.get_size()
+    for x in range(0, surface_size[0] // size[0] + 1):
+        for y in range(0, surface_size[1] // size[1] + 1):
+            surface.blit(scaled_image, (x * size[0], y * size[1]))
+    return surface
+
