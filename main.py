@@ -133,7 +133,7 @@ def move_right():
         snake.append((portal1[0] + 1, portal1[1]))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_x := head[0]) != 1920 // SIZE - 1:
+    if (head_x := head[0]) < 1920 // SIZE - 1:
         snake.append((head_x + 1, head[1]))
         save_corner((head_x, head[1]), dir_before_move)
     else:
@@ -161,11 +161,11 @@ def move_left():
         snake.append((portal1[0] - 1, portal1[1]))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_x := head[0]) != 0:
+    if (head_x := head[0]) >= 1:
         snake.append((head_x - 1, head[1]))
         save_corner((head_x, head[1]), dir_before_move)
     else:
-        snake.append((1920 // SIZE, head[1]))
+        snake.append((1920 // SIZE - 1, head[1]))
         save_corner((1920 // SIZE, head[1]), dir_before_move)
 
 def move_down():
@@ -188,7 +188,7 @@ def move_down():
         snake.append((portal1[0], portal1[1] + 1))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_y := head[1]) != 1080 // SIZE - 1:
+    if (head_y := head[1]) <= 1080 // SIZE - 2:
         snake.append((head[0], head_y + 1))
         save_corner((head[0], head_y), dir_before_move)
     else:
@@ -216,11 +216,11 @@ def move_up():
         snake.append((portal1[0], portal1[1] - 1))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_y := head[1]) != 0:
+    if (head_y := head[1]) >= 1:
         snake.append((head[0], head_y - 1))
         save_corner((head[0], head_y), dir_before_move)
     else:
-        snake.append((head[0], 1080 // SIZE))
+        snake.append((head[0], 1080 // SIZE - 1))
         save_corner((head[0], 1080 // SIZE), dir_before_move)
 def add_body_part():
     global CURRENT_DIRECTION
@@ -315,7 +315,6 @@ def game_loop(map_str):
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
-    last_direction = CURRENT_DIRECTION
 
     # nur bestimmte events speichern (Mausbewegung zb ausschließen)
     pygame.event.set_allowed((pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP))
@@ -347,12 +346,9 @@ def game_loop(map_str):
 
         if not pressed_direction_keys_queue:
             alive = move(CURRENT_DIRECTION)
-            last_direction = CURRENT_DIRECTION
         else:
             wanted_direction = pressed_direction_keys_queue.popleft()
-            if wanted_direction != last_direction:
-                alive = move(wanted_direction)
-            last_direction = wanted_direction
+            alive = move(wanted_direction)
 
         if alive:
             # fill the screen with a color to wipe away anything from last frame
