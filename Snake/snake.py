@@ -1,13 +1,10 @@
 # Example file showing a basic pygame "game loop"
 import collections
-
-import pygame
-import utils
+from Snake import utils
+from Snake.assets import *
 
 # pygame setup
-pygame.init()
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-clock = pygame.time.Clock()
+
 running = True
 SIZE = 30
 snake = list()
@@ -18,40 +15,8 @@ CURRENT_DIRECTION = "r"
 wanted_direction = "r"
 alive = True
 score = 0
-font = pygame.font.SysFont("comicsansms", 72)
 walls = list()
 
-eat_sound = pygame.mixer.Sound("sounds/eat_sound.wav")
-damage_sound = pygame.mixer.Sound("sounds/damage.wav")
-portal_sound = pygame.mixer.Sound("sounds/portal.wav")
-click_sound = pygame.mixer.Sound("sounds/click.wav")
-beat_highscore_sound = pygame.mixer.Sound("sounds/beat_highscore.wav")
-boost_sound = pygame.mixer.Sound("sounds/boost.wav")
-# r right l left u up d down (snake move direction
-snake_part_rl = pygame.image.load("pictures/textures/part_rl.bmp")
-snake_part_ud = pygame.image.load("pictures/textures/part_ud.bmp")
-
-snake_corner_dr = pygame.image.load("pictures/textures/corner_dr.bmp")
-snake_corner_dl = pygame.image.load("pictures/textures/corner_dl.bmp")
-snake_corner_ur = pygame.image.load("pictures/textures/corner_ur.bmp")
-snake_corner_ul = pygame.image.load("pictures/textures/corner_ul.bmp")
-
-snake_head_r = pygame.image.load("pictures/textures/head_r.bmp")
-snake_head_u = pygame.image.load("pictures/textures/head_u.bmp")
-snake_head_d = pygame.image.load("pictures/textures/head_d.bmp")
-snake_head_l = pygame.image.load("pictures/textures/head_l.bmp")
-
-snake_end_r = pygame.image.load("pictures/textures/end_r.bmp")
-snake_end_u = pygame.image.load("pictures/textures/end_u.bmp")
-snake_end_d = pygame.image.load("pictures/textures/end_d.bmp")
-snake_end_l = pygame.image.load("pictures/textures/end_l.bmp")
-
-wall_part = pygame.image.load("pictures/textures/wall.bmp")
-
-
-portal_image = pygame.image.load("pictures/textures/portal.bmp")
-
-sweet_image = pygame.image.load("pictures/textures/fruit.bmp")
 MAP = list()
 portal1 = tuple()
 portal2 = tuple()
@@ -73,10 +38,10 @@ def init(map_str):
     running = True
 
 
-def draw_score(points: int, highscore: int):
+def draw_score(points: int, highscore: int, screen):
     text = font.render(f"{points} HIGSCORE: {highscore}", True, "blue")
     screen.blit(text,
-                (0, 0))
+                (SIZE + 10, SIZE + 10))
 
 def reset():
     global snake
@@ -104,8 +69,8 @@ def move(direction: str):
         return False
     return True
 
-def draw_sweet():
-    draw_picture(sweet_image, sweet[0], sweet[1])
+def draw_sweet(screen):
+    draw_picture(sweet_image, sweet[0], sweet[1], screen)
 
 def save_corner(pos, dir_before_move: str):
     global CURRENT_DIRECTION
@@ -230,25 +195,25 @@ def add_body_part():
 def check_sweet() -> bool:
     return snake[-1] == sweet
 
-def draw_picture(image, x, y):
+def draw_picture(image, x, y, screen):
     screen.blit(image, (x * SIZE, y * SIZE))
 
-def draw_snake_head():
+def draw_snake_head(screen):
     if CURRENT_DIRECTION == "r":
-        draw_picture(snake_head_l, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_l, snake[-1][0], snake[-1][1], screen)
         return
     if CURRENT_DIRECTION == "d":
-        draw_picture(snake_head_d, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_d, snake[-1][0], snake[-1][1], screen)
         return
     if CURRENT_DIRECTION == "l":
-        draw_picture(snake_head_r, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_r, snake[-1][0], snake[-1][1], screen)
         return
     if CURRENT_DIRECTION == "u":
-        draw_picture(snake_head_u, snake[-1][0], snake[-1][1])
+        draw_picture(snake_head_u, snake[-1][0], snake[-1][1], screen)
         return
 
 
-def draw_snake_tail_part(x, y):
+def draw_snake_tail_part(x, y, screen):
     if (position := (x, y)) not in corner_safe:
         return
     rotation = corner_safe[position]
@@ -258,52 +223,53 @@ def draw_snake_tail_part(x, y):
         #SORRY :( ber der code spart ein paat if abfragen weil man jetzt nur aufs ende von der rotation schauen muss
         match rotation[-1]:
             case "r":             # rotation in ("r" "ur" "dr")
-                draw_picture(snake_end_r, x, y)
+                draw_picture(snake_end_r, x, y, screen)
             case "l":
-                draw_picture(snake_end_l, x, y)
+                draw_picture(snake_end_l, x, y, screen)
             case "u":
-                draw_picture(snake_end_u, x, y)
+                draw_picture(snake_end_u, x, y, screen)
             case "d":
-                draw_picture(snake_end_d, x, y)
+                draw_picture(snake_end_d, x, y, screen)
     else:
         match rotation:
             case "r" | "l":
-                draw_picture(snake_part_rl, x, y)
+                draw_picture(snake_part_rl, x, y, screen)
             case "u" | "d":
-                draw_picture(snake_part_ud, x, y)
+                draw_picture(snake_part_ud, x, y, screen)
             case "rd" | "ul":
-                draw_picture(snake_corner_dr, x, y)
+                draw_picture(snake_corner_dr, x, y, screen)
             case "dr" | "lu":
-                draw_picture(snake_corner_ul, x, y)
+                draw_picture(snake_corner_ul, x, y, screen)
             case "ru" | "dl":
-                draw_picture(snake_corner_ur, x, y)
+                draw_picture(snake_corner_ur, x, y, screen)
             case "ur" | "ld":
-                draw_picture(snake_corner_dl, x, y)
+                draw_picture(snake_corner_dl, x, y, screen)
 
     keys_to_delete = [key for key in corner_safe.keys() if key not in snake]
     for i in keys_to_delete:
         corner_safe.pop(i)
 
-def draw_snake_tail():
+def draw_snake_tail(screen):
     for row_count, row in enumerate(snake):
-        draw_snake_tail_part(row[0], row[1])
+        draw_snake_tail_part(row[0], row[1], screen)
 
-def draw_snake():
-    draw_snake_head()
-    draw_snake_tail()
+def draw_snake(screen):
+    draw_snake_head(screen)
+    draw_snake_tail(screen)
 
-def draw_walls():
+def draw_walls(screen):
     for row_count, row in enumerate(walls):
-        draw_picture(wall_part, row[0], row[1])
+        draw_picture(wall_part, row[0], row[1], screen)
 
-def draw_portals():
-    draw_picture(portal_image, portal1[0], portal1[1])
-    draw_picture(portal_image, portal2[0], portal2[1])
+def draw_portals(screen):
+    draw_picture(portal_image, portal1[0], portal1[1], screen)
+    draw_picture(portal_image, portal2[0], portal2[1], screen)
 
 def play_sound(sound):
     pygame.mixer.Sound.play(sound)
     pygame.mixer.music.stop()
-def game_loop(map_str):
+def game_loop(map_str, screen):
+
     highscore_set = False
     global running
     global alive
@@ -353,10 +319,10 @@ def game_loop(map_str):
         if alive:
             # fill the screen with a color to wipe away anything from last frame
             screen.fill("black")
-            draw_walls()
-            draw_portals()
-            draw_sweet()
-            draw_snake()
+            draw_walls(screen)
+            draw_portals(screen)
+            draw_sweet(screen)
+            draw_snake(screen)
 
             if check_sweet():
                 play_sound(eat_sound)
@@ -369,7 +335,7 @@ def game_loop(map_str):
                         play_sound(beat_highscore_sound)
                         highscore_set = True
 
-            draw_score(score, highscore)
+            draw_score(score, highscore, screen)
             # flip() the display to put your work on screen
             pygame.display.flip()
         else:
@@ -385,65 +351,3 @@ def game_loop(map_str):
         else:
             clock.tick(10)  # limits FPS to 60
             speed_count = 0
-
-def draw_mini_map(map_name, start_pos):
-    mini_size = 10
-    map = utils.get_map(map_name)
-    my_walls = list()
-    utils.spawn_walls(my_walls, map)
-    wall_part_mini = pygame.transform.scale(wall_part, (mini_size, mini_size))
-    portal_image_mini = pygame.transform.scale(portal_image, (mini_size, mini_size))
-    portal1, portal2 = utils.spawn_portal(map)
-    for row_count, row in enumerate(my_walls):
-        screen.blit(wall_part_mini, (start_pos[0] + row[0] * mini_size, start_pos[1] + row[1] * mini_size))
-    screen.blit(portal_image_mini, (start_pos[0] + portal1[0] * mini_size, start_pos[1] + portal1[1] * mini_size))
-    screen.blit(portal_image_mini, (start_pos[0] + portal2[0] * mini_size, start_pos[1] + portal2[1] * mini_size))
-def intro():
-    global screen
-    global font
-    blink_count = 0
-    highscore_map_1 = utils.get_highscore("map1.csv")
-    highscore_map_2 = utils.get_highscore("map2.csv")
-    text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
-    text_rect = text.get_rect(center=(1920 / 2, 100))
-    map1_text = font.render(f"(1) Highscore: {highscore_map_1}", True, "white")
-    map2_text = font.render(f"(2)Highscore: {highscore_map_2}", True, "white")
-    map1_text_rect = map1_text.get_rect()
-    map2_text_rect = map2_text.get_rect()
-    map1_text_rect.center = (520, 780)
-    map2_text_rect.center = (1400, 780)
-    while intro:
-        keys = pygame.key.get_pressed()
-        for event in pygame.event.get():
-            if keys[pygame.K_1]:
-                play_sound(click_sound)
-                return "map1.csv"
-            if keys[pygame.K_2]:
-                play_sound(click_sound)
-                return "map2.csv"
-            if keys[pygame.K_DELETE]:
-                return
-        screen.fill("black")
-        if blink_count < 10:
-            text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
-        else:
-            text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "red")
-        screen.blit(text,
-                    text_rect)
-        draw_mini_map("map1.csv", (200, 360))
-        draw_mini_map("map1.csv", (1080, 360))
-        screen.blit(map1_text, map1_text_rect)
-        screen.blit(map2_text, map2_text_rect)
-        pygame.display.update()
-        blink_count += 1
-        if blink_count == 20:
-            blink_count = 0
-        clock.tick(20)
-
-if __name__ == "__main__":
-    while True:
-        map = intro()
-        if not map:
-            break
-        game_loop(map)
-    pygame.quit()

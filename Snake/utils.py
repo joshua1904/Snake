@@ -1,8 +1,10 @@
 import csv
 import random
 import json
+from pathlib import Path
+from Snake.assets import SOURCE
 def get_map(map_name):
-    with open(map_name, "r") as f:
+    with open(Path(SOURCE, map_name), "r") as f:
         return list(csv.reader(f, delimiter=";"))
 
 def spawn_portal(MAP: list) -> tuple:
@@ -32,7 +34,7 @@ def set_highscore(map_str, score):
     highscore_json = get_json()
     highscore_json[map_str] = score
     print(highscore_json)
-    with open("highscore.json", "w") as f:
+    with open(Path(SOURCE, "highscore.json").absolute(), "w") as f:
         json.dump(highscore_json, f)
 def get_highscore(map_str):
     data = get_json()
@@ -40,7 +42,5 @@ def get_highscore(map_str):
         return data[map_str]
     return 0
 def get_json():
-    with open("highscore.json", "r") as f:
+    with open(Path(SOURCE, "highscore.json"), "r") as f:
         return json.load(f)
-set_highscore("test", 1)
-#print(get_highscore("map1.csv"))
