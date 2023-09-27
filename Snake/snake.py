@@ -1,5 +1,8 @@
 # Example file showing a basic pygame "game loop"
 import collections
+
+import pygame
+
 from Snake import utils
 from Snake.assets import *
 
@@ -19,18 +22,23 @@ score = 0
 walls = list()
 
 MAP = list()
+MAP_WIDTH = 0
+MAP_HEIGHT = 0
+map_surface = pygame.Surface((1, 1))
 portal1 = tuple()
 portal2 = tuple()
 sweet = tuple()
 
-def init(map_str, map_surface):
-    global portal1, portal2, sweet, snake, CURRENT_DIRECTION, wanted_direction, alive, running, MAP, corner_save
+def init(map_str, screen):
+    global portal1, portal2, sweet, snake, CURRENT_DIRECTION, wanted_direction, alive, running, MAP, MAP_WIDTH, MAP_HEIGHT, corner_save
     walls.clear()
     MAP = utils.get_map(map_str)
+    MAP_WIDTH = len(MAP[0])
+    MAP_HEIGHT = len(MAP)
     utils.spawn_walls(walls, MAP)
     portal1, portal2 = utils.spawn_portal(MAP)
     utils.spawn_walls(walls, MAP)
-    init_map_surface(map_surface)
+    init_map_surface(screen)
     CURRENT_DIRECTION = "r"
     wanted_direction = "r"
     snake = [(10, 1), (11, 1)]
@@ -39,9 +47,12 @@ def init(map_str, map_surface):
     alive = True
     running = True
 
-def init_map_surface(map_surface):
-    map_surface = utils.init_background(wall_part, map_surface)
-    # map_surface.fill("black")
+def init_map_surface(screen):
+    global map_surface
+    map_surface = screen.copy()
+    map_surface.fill("black")
+    background_surface = utils.create_background(wall_part, (MAP_WIDTH * SIZE, MAP_HEIGHT * SIZE))
+    map_surface.blit(background_surface, (0, 0))
     for wall in walls:
         draw_picture(wall_part, wall[0], wall[1], map_surface)
     draw_picture(portal_image, portal1[0], portal1[1], map_surface)
@@ -107,7 +118,7 @@ def move_right():
         snake.append((portal1[0] + 1, portal1[1]))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_x := head[0]) < SIZE - 1:
+    if (head_x := head[0]) < MAP_WIDTH - 1:
         snake.append((head_x + 1, head[1]))
         save_corner((head_x, head[1]), dir_before_move)
     else:
@@ -140,9 +151,9 @@ def move_left():
         snake.append((head_x - 1, head[1]))
         save_corner((head_x, head[1]), dir_before_move)
     else:
-        snake.append((SIZE - 1, head[1]))
+        snake.append((MAP_WIDTH - 1, head[1]))
         save_corner((head_x, head[1]), dir_before_move)
-        save_corner((SIZE, head[1]), dir_before_move)
+        save_corner((MAP_WIDTH, head[1]), dir_before_move)
 
 def move_down():
     global CURRENT_DIRECTION
@@ -164,7 +175,7 @@ def move_down():
         snake.append((portal1[0], portal1[1] + 1))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_y := head[1]) < SIZE - 1:
+    if (head_y := head[1]) < MAP_HEIGHT - 1:
         snake.append((head[0], head_y + 1))
         save_corner((head[0], head_y), dir_before_move)
     else:
@@ -197,9 +208,9 @@ def move_up():
         snake.append((head[0], head_y - 1))
         save_corner((head[0], head_y), dir_before_move)
     else:
-        snake.append((head[0], SIZE - 1))
+        snake.append((head[0], MAP_HEIGHT - 1))
         save_corner((head[0], head_y), dir_before_move)
-        save_corner((head[0], SIZE), dir_before_move)
+        save_corner((head[0], MAP_HEIGHT), dir_before_move)
 def add_body_part():
     global CURRENT_DIRECTION
     snake.append(sweet)
@@ -270,7 +281,7 @@ def draw_snake(screen):
     draw_snake_head(screen)
     draw_snake_tail(screen)
 
-def draw_map(screen, map_surface):
+def draw_map(screen):
     screen.blit(map_surface, (0, 0))
 
 def play_sound(sound):
@@ -278,7 +289,6 @@ def play_sound(sound):
     pygame.mixer.music.stop()
 def game_loop(map_str, screen):
 
-    map_surface = screen.copy()
     highscore_set = False
     global running
     global alive
@@ -286,7 +296,7 @@ def game_loop(map_str, screen):
     score = 0
     global sweet
     global speed
-    init(map_str, map_surface)
+    init(map_str, screen)
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
@@ -334,7 +344,7 @@ def game_loop(map_str, screen):
 
         if alive:
             # fill the screen with a color to wipe away anything from last frame
-            draw_map(screen, map_surface)
+            draw_map(screen)
             draw_sweet(screen)
             draw_snake(screen)
 
@@ -363,5 +373,5 @@ def game_loop(map_str, screen):
             clock.tick(20)
             speed_count += 1
         else:
-            clock.tick(10)  # limits FPS to 60
+            clock.tick(2)  # limits FPS to 60
             speed_count = 0
