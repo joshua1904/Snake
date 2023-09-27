@@ -61,14 +61,3 @@ def create_background(image: pygame.image, map_size, tile_size=(360, 360), darke
 
 
 
-def create_map_from_image(image: pygame.Surface):
-    """Image has to be a black and white bitmap, white pixels are walls, size of image is size of map"""
-    for y in range(0, image.get_height()):
-        for x in range(0, image.get_width()):
-            color = image.get_at((x, y))
-            if color.r >= 250:
-                print("1;", end="")
-            elif color.r <= 10:
-                print("0;", end="")
-        print("")
-
