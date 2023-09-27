@@ -4,10 +4,7 @@ from Snake import utils
 from Snake.assets import *
 
 # pygame setup
-pygame.init()
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-map_surface = screen.copy()
-clock = pygame.time.Clock()
+
 running = True
 SIZE = 30
 snake = list()
@@ -19,54 +16,6 @@ wanted_direction = "r"
 alive = True
 score = 0
 walls = list()
-
-eat_sound = pygame.mixer.Sound("sounds/eat_sound.wav")
-damage_sound = pygame.mixer.Sound("sounds/damage.wav")
-portal_sound = pygame.mixer.Sound("sounds/portal.wav")
-click_sound = pygame.mixer.Sound("sounds/click.wav")
-beat_highscore_sound = pygame.mixer.Sound("sounds/beat_highscore.wav")
-boost_sound = pygame.mixer.Sound("sounds/boost.wav")
-# r right l left u up d down (snake move direction
-
-snake_part_rl = pygame.image.load("pictures/textures/part_rl.bmp")
-snake_part_rl.set_colorkey("black")
-snake_part_ud = pygame.image.load("pictures/textures/part_ud.bmp")
-snake_part_ud.set_colorkey("black")
-
-snake_corner_dr = pygame.image.load("pictures/textures/corner_dr.bmp")
-snake_corner_dr.set_colorkey("black")
-snake_corner_dl = pygame.image.load("pictures/textures/corner_dl.bmp")
-snake_corner_dl.set_colorkey("black")
-snake_corner_ur = pygame.image.load("pictures/textures/corner_ur.bmp")
-snake_corner_ur.set_colorkey("black")
-snake_corner_ul = pygame.image.load("pictures/textures/corner_ul.bmp")
-snake_corner_ul.set_colorkey("black")
-
-snake_head_r = pygame.image.load("pictures/textures/head_r.bmp")
-snake_head_r.set_colorkey("black")
-snake_head_u = pygame.image.load("pictures/textures/head_u.bmp")
-snake_head_u.set_colorkey("black")
-snake_head_d = pygame.image.load("pictures/textures/head_d.bmp")
-snake_head_d.set_colorkey("black")
-snake_head_l = pygame.image.load("pictures/textures/head_l.bmp")
-snake_head_l.set_colorkey("black")
-
-snake_end_r = pygame.image.load("pictures/textures/end_r.bmp")
-snake_end_r.set_colorkey("black")
-snake_end_u = pygame.image.load("pictures/textures/end_u.bmp")
-snake_end_u.set_colorkey("black")
-snake_end_d = pygame.image.load("pictures/textures/end_d.bmp")
-snake_end_d.set_colorkey("black")
-snake_end_l = pygame.image.load("pictures/textures/end_l.bmp")
-snake_end_l.set_colorkey("black")
-
-wall_part = pygame.image.load("pictures/textures/wall.bmp")
-
-portal_image = pygame.image.load("pictures/textures/portal.bmp")
-portal_image.set_colorkey("black")
-
-sweet_image = pygame.image.load("pictures/textures/fruit.bmp")
-sweet_image.set_colorkey("black")
 
 MAP = list()
 portal1 = tuple()
