@@ -34,7 +34,9 @@ def init(map_str, screen):
     walls.clear()
     MAP = utils.get_map(map_str)
     MAP_WIDTH = len(MAP[0])
-    MAP_HEIGHT = len(MAP)
+    MAP_HEIGHT = len(MAP) - 1
+    print(MAP_WIDTH)
+    print(MAP_HEIGHT)
     utils.spawn_walls(walls, MAP)
     portal1, portal2 = utils.spawn_portal(MAP)
     utils.spawn_walls(walls, MAP)
@@ -373,5 +375,5 @@ def game_loop(map_str, screen):
             clock.tick(20)
             speed_count += 1
         else:
-            clock.tick(2)  # limits FPS to 60
+            clock.tick(10)  # limits FPS to 60
             speed_count = 0
