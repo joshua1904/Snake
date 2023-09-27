@@ -25,13 +25,13 @@ def spawn_walls(walls: list, MAP: list):
             if field == "1":
                 walls.append((field_counter, row_counter))
 
-def spawn_sweet(SIZE, snake, walls):
+def spawn_sweet(SIZE, snake, walls, portals):
     sweet_x = random.randint(1, 1910 // SIZE)
     sweet_y = random.randint(1, 1070 // SIZE)
-    if (sweet_xy := (sweet_x, sweet_y)) not in snake and sweet_xy not in walls:
+    if (sweet_xy := (sweet_x, sweet_y)) not in snake and sweet_xy not in walls and sweet_xy not in (portals[0], portals[1]):
         return sweet_xy
     else:
-        return spawn_sweet(SIZE, snake, walls)
+        return spawn_sweet(SIZE, snake, walls, portals)
 
 def set_highscore(map_str, score):
     highscore_json = get_json()
@@ -58,4 +58,17 @@ def init_background(image: pygame.image, surface: pygame.Surface, size=(360, 360
         for y in range(0, surface_size[1] // size[1] + 1):
             surface.blit(scaled_image, (x * size[0], y * size[1]))
     return surface
+
+
+
+def create_map_from_image(image: pygame.Surface):
+    """Image has to be a black and white bitmap, white pixels are walls, size of image is size of map"""
+    for y in range(0, image.get_height()):
+        for x in range(0, image.get_width()):
+            color = image.get_at((x, y))
+            if color.r >= 250:
+                print("1;", end="")
+            elif color.r <= 10:
+                print("0;", end="")
+        print("")
 

@@ -85,7 +85,7 @@ def init(map_str):
     wanted_direction = "r"
     snake = [(10, 1), (11, 1)]
     corner_save = {(10, 1): "r", (11, 1): "r"}
-    sweet = utils.spawn_sweet(SIZE, snake, walls)
+    sweet = utils.spawn_sweet(SIZE, snake, walls, (portal1, portal2))
     alive = True
     running = True
 
@@ -371,10 +371,12 @@ def game_loop(map_str, screen):
             alive = move(CURRENT_DIRECTION)
             last_direction = CURRENT_DIRECTION
         else:
-            wanted_direction = pressed_direction_keys_queue.popleft()
-            if wanted_direction != last_direction:
-                alive = move(wanted_direction)
-            last_direction = wanted_direction
+            while pressed_direction_keys_queue:         # filter consecutive same directions like 'r', 'r', 'r'
+                wanted_direction = pressed_direction_keys_queue.popleft()
+                if wanted_direction != last_direction:
+                    last_direction = wanted_direction
+                    break
+            alive = move(wanted_direction)
 
         if alive:
             # fill the screen with a color to wipe away anything from last frame
@@ -386,7 +388,7 @@ def game_loop(map_str, screen):
                 play_sound(eat_sound)
                 score += 1
                 add_body_part()
-                sweet = utils.spawn_sweet(SIZE, snake, walls)
+                sweet = utils.spawn_sweet(SIZE, snake, walls, (portal1, portal2))
                 if score > highscore:
                     highscore = score
                     if not highscore_set:
