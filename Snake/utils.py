@@ -26,8 +26,8 @@ def spawn_walls(walls: list, MAP: list):
                 walls.append((field_counter, row_counter))
 
 def spawn_sweet(MAP_WIDTH, MAP_HEIGHT, snake, walls, portals):
-    sweet_x = random.randint(1, MAP_WIDTH)
-    sweet_y = random.randint(1, MAP_HEIGHT)
+    sweet_x = random.randint(0, MAP_WIDTH - 1)
+    sweet_y = random.randint(0, MAP_HEIGHT - 1)
     if (sweet_xy := (sweet_x, sweet_y)) not in snake and sweet_xy not in walls and sweet_xy not in (portals[0], portals[1]):
         return sweet_xy
     else:

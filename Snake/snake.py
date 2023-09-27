@@ -21,6 +21,9 @@ alive = True
 score = 0
 walls = list()
 
+SCREEN_WIDTH = 0
+SCREEN_HEIGHT = 0
+
 MAP = list()
 MAP_WIDTH = 0
 MAP_HEIGHT = 0
@@ -30,13 +33,13 @@ portal2 = tuple()
 sweet = tuple()
 
 def init(map_str, screen):
-    global portal1, portal2, sweet, snake, CURRENT_DIRECTION, wanted_direction, alive, running, MAP, MAP_WIDTH, MAP_HEIGHT, corner_save
+    global portal1, portal2, sweet, snake, CURRENT_DIRECTION, wanted_direction, alive, running,\
+        MAP, MAP_WIDTH, MAP_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, corner_save
     walls.clear()
+    SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_size()
     MAP = utils.get_map(map_str)
     MAP_WIDTH = len(MAP[0])
     MAP_HEIGHT = len(MAP) - 1
-    print(MAP_WIDTH)
-    print(MAP_HEIGHT)
     utils.spawn_walls(walls, MAP)
     portal1, portal2 = utils.spawn_portal(MAP)
     utils.spawn_walls(walls, MAP)
@@ -54,7 +57,7 @@ def init_map_surface(screen):
     map_surface = screen.copy()
     map_surface.fill("black")
     background_surface = utils.create_background(wall_part, (MAP_WIDTH * SIZE, MAP_HEIGHT * SIZE))
-    map_surface.blit(background_surface, (0, 0))
+    draw_picture(background_surface, 0, 0, map_surface)
     for wall in walls:
         draw_picture(wall_part, wall[0], wall[1], map_surface)
     draw_picture(portal_image, portal1[0], portal1[1], map_surface)
@@ -222,7 +225,8 @@ def check_sweet() -> bool:
     return snake[-1] == sweet
 
 def draw_picture(image, x, y, surface):
-    surface.blit(image, (x * SIZE, y * SIZE))
+    surface.blit(image, (x * SIZE + SCREEN_WIDTH // 2 - MAP_WIDTH * SIZE // 2,
+                         y * SIZE + SCREEN_HEIGHT // 2 - MAP_HEIGHT * SIZE // 2))
 
 def draw_snake_head(screen):
     if CURRENT_DIRECTION == "r":
