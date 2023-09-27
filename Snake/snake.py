@@ -107,12 +107,13 @@ def move_right():
         snake.append((portal1[0] + 1, portal1[1]))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_x := head[0]) < 1920 // SIZE - 1:
+    if (head_x := head[0]) < SIZE - 1:
         snake.append((head_x + 1, head[1]))
         save_corner((head_x, head[1]), dir_before_move)
     else:
         snake.append((0, head[1]))
-        save_corner((0, head[1]), dir_before_move)
+        save_corner((head_x, head[1]), dir_before_move)
+        save_corner((-1, head[1]), dir_before_move)
 
 
 def move_left():
@@ -135,12 +136,13 @@ def move_left():
         snake.append((portal1[0] - 1, portal1[1]))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_x := head[0]) >= 1:
+    if (head_x := head[0]) > 0:
         snake.append((head_x - 1, head[1]))
         save_corner((head_x, head[1]), dir_before_move)
     else:
-        snake.append((1920 // SIZE - 1, head[1]))
-        save_corner((1920 // SIZE, head[1]), dir_before_move)
+        snake.append((SIZE - 1, head[1]))
+        save_corner((head_x, head[1]), dir_before_move)
+        save_corner((SIZE, head[1]), dir_before_move)
 
 def move_down():
     global CURRENT_DIRECTION
@@ -162,12 +164,13 @@ def move_down():
         snake.append((portal1[0], portal1[1] + 1))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_y := head[1]) <= 1080 // SIZE - 2:
+    if (head_y := head[1]) < SIZE - 1:
         snake.append((head[0], head_y + 1))
         save_corner((head[0], head_y), dir_before_move)
     else:
         snake.append((head[0], 0))
-        save_corner((head[0], 0), dir_before_move)
+        save_corner((head[0], head_y), dir_before_move)
+        save_corner((head[0], -1), dir_before_move)
 
 
 def move_up():
@@ -190,12 +193,13 @@ def move_up():
         snake.append((portal1[0], portal1[1] - 1))
         save_corner((portal1[0], portal1[1]), dir_before_move)
         return
-    if (head_y := head[1]) >= 1:
+    if (head_y := head[1]) > 0:
         snake.append((head[0], head_y - 1))
         save_corner((head[0], head_y), dir_before_move)
     else:
-        snake.append((head[0], 1080 // SIZE - 1))
-        save_corner((head[0], 1080 // SIZE), dir_before_move)
+        snake.append((head[0], SIZE - 1))
+        save_corner((head[0], head_y), dir_before_move)
+        save_corner((head[0], SIZE), dir_before_move)
 def add_body_part():
     global CURRENT_DIRECTION
     snake.append(sweet)
@@ -259,8 +263,8 @@ def draw_snake_tail_part(x, y, screen):
         corner_save.pop(i)
 
 def draw_snake_tail(screen):
-    for row_count, row in enumerate(snake):
-        draw_snake_tail_part(row[0], row[1], screen)
+    for part in snake:
+        draw_snake_tail_part(part[0], part[1], screen)
 
 def draw_snake(screen):
     draw_snake_head(screen)
