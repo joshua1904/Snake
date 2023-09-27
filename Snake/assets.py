@@ -4,11 +4,11 @@ from pathlib import Path
 pygame.init()
 
 clock = pygame.time.Clock()
-SOURCE = Path("/home/joshua/PycharmProjects/GamingMachine/Snake")
+SOURCE = Path("Snake")
 FULLSCREEN = pygame.FULLSCREEN
 
 #### SNAKE VARS ###########
-eat_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/eat_sound.wav"))
+eat_sound = pygame.mixer.Sound(str(Path(SOURCE, "sounds/eat_sound.wav")))
 damage_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/damage.wav"))
 portal_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/portal.wav"))
 click_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/click.wav"))
@@ -40,3 +40,21 @@ portal_image = pygame.image.load(Path(SOURCE, "pictures/textures/portal.bmp"))
 sweet_image = pygame.image.load(Path(SOURCE, "pictures/textures/fruit.bmp"))
 
 font = pygame.font.SysFont("comicsansms", 50)
+
+# make black pixels transparent
+snake_part_rl.set_colorkey("black")
+snake_part_ud.set_colorkey("black")
+snake_corner_dr.set_colorkey("black")
+snake_corner_dl.set_colorkey("black")
+snake_corner_ur.set_colorkey("black")
+snake_corner_ul.set_colorkey("black")
+snake_head_r.set_colorkey("black")
+snake_head_u.set_colorkey("black")
+snake_head_d.set_colorkey("black")
+snake_head_l.set_colorkey("black")
+snake_end_r.set_colorkey("black")
+snake_end_u.set_colorkey("black")
+snake_end_d.set_colorkey("black")
+snake_end_l.set_colorkey("black")
+portal_image.set_colorkey("black")
+sweet_image.set_colorkey("black")

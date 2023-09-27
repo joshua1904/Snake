@@ -21,7 +21,7 @@ def play_sound(sound):
 def intro():
     blink_count = 0
     highscore_map_1 = utils.get_highscore("map1.csv")
-    highscore_map_2 = utils.get_highscore("map2.csv")
+    highscore_map_2 = utils.get_highscore("map3.csv")
     text = font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
     text_rect = text.get_rect(center=(1920 / 2, 100))
     map1_text = font.render(f"(1) Highscore: {highscore_map_1}", True, "white")
@@ -38,7 +38,7 @@ def intro():
                 return "maps/map1.csv"
             if keys[pygame.K_2]:
                 play_sound(click_sound)
-                return "maps/map2.csv"
+                return "maps/map3.csv"
             if keys[pygame.K_DELETE]:
                 return
         screen.fill("black")
@@ -49,7 +49,7 @@ def intro():
         screen.blit(text,
                     text_rect)
         draw_mini_map("maps/map1.csv", (200, 360))
-        draw_mini_map("maps/map1.csv", (1080, 360))
+        draw_mini_map("maps/map3.csv", (1080, 360))
         screen.blit(map1_text, map1_text_rect)
         screen.blit(map2_text, map2_text_rect)
         pygame.display.update()

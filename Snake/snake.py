@@ -5,6 +5,7 @@ from Snake.assets import *
 
 # pygame setup
 
+
 running = True
 SIZE = 30
 snake = list()
@@ -22,14 +23,14 @@ portal1 = tuple()
 portal2 = tuple()
 sweet = tuple()
 
-def init(map_str):
+def init(map_str, map_surface):
     global portal1, portal2, sweet, snake, CURRENT_DIRECTION, wanted_direction, alive, running, MAP, corner_save
     walls.clear()
     MAP = utils.get_map(map_str)
     utils.spawn_walls(walls, MAP)
     portal1, portal2 = utils.spawn_portal(MAP)
     utils.spawn_walls(walls, MAP)
-    init_map_surface()
+    init_map_surface(map_surface)
     CURRENT_DIRECTION = "r"
     wanted_direction = "r"
     snake = [(10, 1), (11, 1)]
@@ -38,8 +39,7 @@ def init(map_str):
     alive = True
     running = True
 
-def init_map_surface():
-    global map_surface
+def init_map_surface(map_surface):
     map_surface = utils.init_background(wall_part, map_surface)
     # map_surface.fill("black")
     for wall in walls:
@@ -266,7 +266,7 @@ def draw_snake(screen):
     draw_snake_head(screen)
     draw_snake_tail(screen)
 
-def draw_map(screen):
+def draw_map(screen, map_surface):
     screen.blit(map_surface, (0, 0))
 
 def play_sound(sound):
@@ -274,6 +274,7 @@ def play_sound(sound):
     pygame.mixer.music.stop()
 def game_loop(map_str, screen):
 
+    map_surface = screen.copy()
     highscore_set = False
     global running
     global alive
@@ -281,7 +282,7 @@ def game_loop(map_str, screen):
     score = 0
     global sweet
     global speed
-    init(map_str)
+    init(map_str, map_surface)
     highscore = utils.get_highscore(map_str)
     current_highscore = highscore
     speed_count = 0
@@ -329,7 +330,7 @@ def game_loop(map_str, screen):
 
         if alive:
             # fill the screen with a color to wipe away anything from last frame
-            draw_map(screen)
+            draw_map(screen, map_surface)
             draw_sweet(screen)
             draw_snake(screen)
 
