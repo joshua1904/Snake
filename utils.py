@@ -1,6 +1,10 @@
 import csv
 import random
 import json
+
+import pygame
+
+
 def get_map(map_name):
     with open(map_name, "r") as f:
         return list(csv.reader(f, delimiter=";"))
@@ -44,3 +48,16 @@ def get_json():
         return json.load(f)
 set_highscore("test", 1)
 #print(get_highscore("map1.csv"))
+
+
+def create_map_from_image(image: pygame.Surface):
+    """Image has to be a black and white bitmap, white pixels are walls, size of image is size of map"""
+    for y in range(0, image.get_height()):
+        for x in range(0, image.get_width()):
+            color = image.get_at((x, y))
+            if color.r >= 250:
+                print("1;", end="")
+            elif color.r <= 10:
+                print("0;", end="")
+        print("")
+
