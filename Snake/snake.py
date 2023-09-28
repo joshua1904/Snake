@@ -232,18 +232,17 @@ def draw_picture(image, x, y, surface):
                          y * SIZE + SCREEN_HEIGHT // 2 - MAP_HEIGHT * SIZE // 2))
 
 def draw_snake_head(screen):
-    if CURRENT_DIRECTION == "r":
-        draw_picture(snake_head_l, snake[-1][0], snake[-1][1], screen)
-        return
-    if CURRENT_DIRECTION == "d":
-        draw_picture(snake_head_d, snake[-1][0], snake[-1][1], screen)
-        return
-    if CURRENT_DIRECTION == "l":
-        draw_picture(snake_head_r, snake[-1][0], snake[-1][1], screen)
-        return
-    if CURRENT_DIRECTION == "u":
-        draw_picture(snake_head_u, snake[-1][0], snake[-1][1], screen)
-        return
+    head_x, head_y = snake[-1]
+    if (head_x, head_y) not in (portal1, portal2):
+        match CURRENT_DIRECTION:
+            case "r":
+                draw_picture(snake_head_l, head_x, head_y, screen)
+            case "d":
+                draw_picture(snake_head_d, head_x, head_y, screen)
+            case "l":
+                draw_picture(snake_head_r, head_x, head_y, screen)
+            case "u":
+                draw_picture(snake_head_u, head_x, head_y, screen)
 
 
 def draw_snake_tail_part(x, y, screen):
@@ -382,5 +381,5 @@ def game_loop(map_str, screen):
             clock.tick(20)
             speed_count += 1
         else:
-            clock.tick(10)  # limits FPS to 60
+            clock.tick(4)  # limits FPS to 60
             speed_count = 0

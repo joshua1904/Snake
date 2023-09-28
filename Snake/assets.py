@@ -8,7 +8,7 @@ SOURCE = Path("Snake")
 FULLSCREEN = pygame.FULLSCREEN
 
 #### SNAKE VARS ###########
-eat_sound = pygame.mixer.Sound(str(Path(SOURCE, "sounds/eat_sound.wav")))
+eat_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/eat_sound.wav"))
 damage_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/damage.wav"))
 portal_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/portal.wav"))
 click_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/click.wav"))
