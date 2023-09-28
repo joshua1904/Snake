@@ -46,8 +46,8 @@ def init(map_str, screen):
     init_map_surface(screen)
     CURRENT_DIRECTION = "r"
     wanted_direction = "r"
-    snake = [(10, 1), (11, 1)]
-    corner_save = {(10, 1): "r", (11, 1): "r"}
+    snake = [(4, 5), (5, 5)]
+    corner_save = {(4, 5): "r", (5, 5): "r"}
     sweet = utils.spawn_sweet(MAP_WIDTH, MAP_HEIGHT, snake, walls, (portal1, portal2))
     alive = True
     running = True
@@ -381,5 +381,5 @@ def game_loop(map_str, screen):
             clock.tick(20)
             speed_count += 1
         else:
-            clock.tick(4)  # limits FPS to 60
+            clock.tick(10)  # limits FPS to 60
             speed_count = 0
