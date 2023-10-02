@@ -60,10 +60,10 @@ def init_map_surface(screen):
     border = pygame.Surface((MAP_WIDTH * (SIZE + 2), MAP_HEIGHT * (SIZE + 2)))
     border.fill("darkorchid4")
     draw_picture(border, -1, -1, map_surface)
-    background_surface = utils.create_background(wall_part, (MAP_WIDTH * SIZE, MAP_HEIGHT * SIZE))
+    background_surface = utils.create_background(wall_image, (MAP_WIDTH * SIZE, MAP_HEIGHT * SIZE))
     draw_picture(background_surface, 0, 0, map_surface)
     for wall in walls:
-        draw_picture(wall_part, wall[0], wall[1], map_surface)
+        draw_picture(wall_image, wall[0], wall[1], map_surface)
     draw_picture(portal_image, portal1[0], portal1[1], map_surface)
     draw_picture(portal_image, portal2[0], portal2[1], map_surface)
 

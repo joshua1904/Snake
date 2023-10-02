@@ -138,3 +138,10 @@ class GameBoard:
             return self.spawn_sweet()
 
 
+class Game:
+    """The game"""
+
+    def __init__(self, board: GameBoard):
+        self.board = board
+
+

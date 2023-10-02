@@ -7,7 +7,7 @@ def draw_mini_map(map_name, start_pos):
     map = utils.get_map(map_name)
     my_walls = list()
     utils.spawn_walls(my_walls, map)
-    wall_part_mini = pygame.transform.scale(wall_part, (mini_size, mini_size))
+    wall_part_mini = pygame.transform.scale(wall_image, (mini_size, mini_size))
     portal_image_mini = pygame.transform.scale(portal_image, (mini_size, mini_size))
     portal1, portal2 = utils.spawn_portal(map)
     for row_count, row in enumerate(my_walls):
