@@ -1,7 +1,9 @@
 import pygame
 from pathlib import Path
 
-SOURCE = Path("Snake")
+pygame.init()
+
+SOURCE = Path("")
 
 # Font
 font = pygame.font.SysFont("comicsansms", 50)
