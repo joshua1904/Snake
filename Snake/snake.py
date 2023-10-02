@@ -38,6 +38,7 @@ def init(map_str, screen):
     walls.clear()
     SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_size()
     MAP = utils.get_map(map_str)
+    # print(MAP)
     MAP_WIDTH = len(MAP[0])
     MAP_HEIGHT = len(MAP) - 1
     utils.spawn_walls(walls, MAP)
