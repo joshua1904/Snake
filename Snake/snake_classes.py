@@ -186,11 +186,15 @@ class GameBoard:
 class Game:
     """The game"""
 
-    def __init__(self, map_list: List[List[Any]]):
+    def __init__(self, map_list: List[List[Any]], highscore: int):
+
         self.board = GameBoard(self, map_list)
         self.snake: Snake
         self.sweet: BoardCell
+
         self.score = 0
+        self.highscore = highscore
+        self.highscore_changed = False
 
         self._init_snake(map_list)
         self.spawn_sweet()
@@ -218,6 +222,17 @@ class Game:
             return None
         else:
             return self.spawn_sweet()       # recursive
+
+    def inc_score(self) -> bool:
+        """
+        Increase the score by 1 and check if highscore is met
+        """
+        self.score += 1
+        if self.score > self.highscore:
+            self.highscore = self.score
+            self.highscore_changed = True
+        return self.highscore_changed
+
 
 
 

@@ -1,13 +1,13 @@
 """
 The front-end with pygame
 """
-import itertools
 from collections import deque
-from pathlib import Path
 
 import snake_classes
 import assets
 import pygame
+
+from Snake import utils
 
 CLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -32,9 +32,11 @@ class GameView:
         'ur': 'dl', 'ld': 'dl'
     }
 
-    def __init__(self, game: snake_classes.Game, cell_size=30):
+    def __init__(self, game: snake_classes.Game, map_str: str, cell_size=30):
         self.game = game
+        self.map_str = map_str
         self.cell_size = cell_size
+
         self.map_width_px = self.game.board.dim.x * self.cell_size
         self.map_height_px = self.game.board.dim.y * self.cell_size
         self.map_surface: pygame.Surface        # the (immutable) background with walls and portals
@@ -125,6 +127,11 @@ class GameView:
         sweet = self.game.sweet
         self.draw_to_board(assets.sweet_image, sweet.pos.x, sweet.pos.y, SCREEN)
 
+    def draw_score(self):
+        """Draw the current score"""
+        text = assets.font.render(f"{self.game.score} HIGHSCORE: {self.game.highscore}", True, "blue")
+        SCREEN.blit(text, (30, 30))
+
     def game_loop(self):
         """the main loop"""
 
@@ -182,15 +189,21 @@ class GameView:
 
                 if move_event == "EATEN":
                     play_sound(assets.eat_sound)
-                    self.game.score += 1
+                    highscore_changed = self.game.inc_score()
+                    if highscore_changed:
+                        play_sound(assets.beat_highscore_sound)
                     self.game.spawn_sweet()
+
                 elif move_event == "PORTAL":
                     play_sound(assets.portal_sound)
 
+                self.draw_score()
                 pygame.display.flip()
 
             else:
                 play_sound(assets.damage_sound)
+                if self.game.highscore_changed:
+                    utils.set_highscore(self.map_str, self.game.highscore)
                 return
 
             if speed:
@@ -206,22 +219,22 @@ class GameView:
 if __name__ == "__main__":
 
     map_list = [[1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 'r', 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 'r', 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0],
+                [0, 0, 0, 5, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1]]
 
-    game = snake_classes.Game(map_list)
+    game = snake_classes.Game(map_list, 12)
 
-    game_view = GameView(game)
+    game_view = GameView(game, "map-name")
 
     game_view.game_loop()
 
