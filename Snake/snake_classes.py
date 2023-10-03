@@ -90,7 +90,7 @@ class Snake:
         else:
             self.directions.append(new_direction)
 
-    def move(self, direction: str) -> bool:
+    def move(self, direction: str) -> str:
         """
         Saves a new snake-part to the snake in front (the head)
         and removes the last part (the tail)
@@ -100,7 +100,7 @@ class Snake:
 
         # Check for crash
         if new_position in self.positions or new_position in self.board.walls:
-            return False
+            return "CRASH"
 
         # Check for portals
         elif new_position in self.board.portals:
@@ -117,8 +117,9 @@ class Snake:
         if new_position != self.board.sweet.pos:
             self.positions.popleft()
             self.directions.popleft()
-
-        return True
+            return "MOVE"
+        else:
+            return "EATEN"
 
 
 class GameBoard:

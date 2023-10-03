@@ -75,6 +75,31 @@ class GameView:
         surface.blit(image, (x * self.cell_size + SCREEN_WIDTH // 2 - self.map_width_px // 2,
                              y * self.cell_size + SCREEN_HEIGHT // 2 - self.map_height_px // 2))
 
+    def draw_snake(self):
+        """
+        Draw the snake
+        end -> parts -> head
+        """
+        snake = self.game.snake
+        head_pos = snake.positions[-1]
+        head_dir = snake.directions[-1]
+        end_pos = snake.positions[0]
+        end_dir = snake.directions[0]
+
+        # Draw head
+        self.draw_to_board(assets.snake_head[head_dir], head_pos.x, head_pos.y, SCREEN)
+
+        # Draw tail
+        self.draw_to_board(assets.snake_end[end_dir], end_pos.x, end_pos.y, SCREEN)
+
+        # Draw middle parts
+        for part_pos, part_dir in zip(snake.positions[1:-1], snake.directions[1:-1]):
+            if part_dir in ('r', 'l'):
+                part_dir = 'rl'
+            elif part_dir in ('u', 'd'):
+                part_dir = 'ud'
+            self.draw_to_board(assets.snake_end[part_dir], part_pos.x, part_pos.y, SCREEN)
+
     def game_loop(self):
         """the main loop"""
 
