@@ -80,27 +80,18 @@ class Snake:
         Saves the snake in two double-ended-lists (deque), one for the positions and one for the directions
         """
         self.board: GameBoard = board
-        self.positions: Deque[BoardPosition] = deque([start_pos])
-        self.directions: Deque[str] = deque([start_direction])
-
-    def _save_direction(self, new_direction: str):
-        """
-        Save the new direction to self.directions
-        :param new_direction: the direction to move from the current head position
-        """
-        last_direction = self.directions[-1][-1]
-        if last_direction != new_direction:
-            self.directions.append(f"{last_direction}{new_direction}")
-        else:
-            self.directions.append(new_direction)
+        self.positions: Deque[BoardPosition] = deque([start_pos - Snake.DIRECTIONS[start_direction], start_pos])
+        self.directions: Deque[str] = deque([start_direction, start_direction])
 
     def move(self, direction: str) -> str:
         """
         Saves a new snake-part to the snake in front (the head)
         and removes the last part (the tail)
         """
+        move_event = ""
+
         # do not move in opposite direction
-        last_direction = self.directions[-1][-1]
+        last_direction = self.directions[-1]
         i = Snake.OPPOSITES.index(last_direction)
         if direction == Snake.OPPOSITES[i - 2]:
             direction = last_direction
@@ -117,10 +108,11 @@ class Snake:
             start_portal = self.board.portals[new_position]
             target_portal = start_portal.partner
             new_position = target_portal.pos + Snake.DIRECTIONS[direction]
+            move_event = "PORTAL"
 
         # Append new head
         self.positions.append(new_position)
-        self._save_direction(direction)
+        self.directions.append(direction)
 
         # Check for sweet -> only pop tail if not eaten
         if new_position == self.board.game.sweet.pos:
@@ -128,10 +120,10 @@ class Snake:
 
         self.positions.popleft()
         self.directions.popleft()
-        print(self.directions)
-        print(self.positions)
+        # print(self.directions)
+        # print(self.positions)
 
-        return "MOVE"
+        return move_event
 
 
 class GameBoard:

@@ -24,8 +24,8 @@ class GameView:
     The view of a single game
     """
     MIDDLE_PARTS = {
-        'l': 'rl', 'r': 'rl',
-        'u': 'ud', 'd': 'ud',
+        'll': 'rl', 'rr': 'rl',
+        'uu': 'ud', 'dd': 'ud',
         'rd': 'dr', 'ul': 'dr',
         'dr': 'ul', 'lu': 'ul',
         'ru': 'ur', 'dl': 'ur',
@@ -98,11 +98,9 @@ class GameView:
         """
         snake = self.game.snake
         head_pos = snake.positions[-1]
-        head_dir = snake.directions[-1][-1]                         # only last direction: 'ru' -> 'u'
+        head_dir = snake.directions[-1]
         end_pos = snake.positions[0]
-        end_dir = snake.directions[0][-1]                           # only last direction: 'ru' -> 'u'
-        middle_pos = itertools.islice(snake.positions, 1, len(snake.positions) - 1)
-        middle_dir = itertools.islice(snake.directions, 1, len(snake.positions) - 1)
+        end_dir = snake.directions[1]
 
         # Draw head
         self.draw_to_board(assets.snake_head[head_dir], head_pos.x, head_pos.y, SCREEN)
@@ -111,8 +109,12 @@ class GameView:
         self.draw_to_board(assets.snake_end[end_dir], end_pos.x, end_pos.y, SCREEN)
 
         # Draw middle parts
-        for part_pos, part_dir in zip(middle_pos, middle_dir):
-            self.draw_to_board(assets.snake_part[GameView.MIDDLE_PARTS[part_dir]], part_pos.x, part_pos.y, SCREEN)
+        for i, part_pos in enumerate(snake.positions):
+            if i in range(1, len(snake.positions) - 1):
+                part_dir = snake.directions[i]
+                part_next_dir = snake.directions[i + 1]
+                corner_id = GameView.MIDDLE_PARTS[part_dir + part_next_dir]
+                self.draw_to_board(assets.snake_part[corner_id], part_pos.x, part_pos.y, SCREEN)
 
     def draw_map(self):
         """Draw the background and map to the screen"""
@@ -134,7 +136,7 @@ class GameView:
 
         speed = False
         speed_count = 0
-        last_direction = self.game.snake.directions[-1][-1]     # only last direction: 'ru' -> 'u'
+        last_direction = self.game.snake.directions[-1]     
         wanted_direction = last_direction
         running = True
 
@@ -162,7 +164,7 @@ class GameView:
                         speed = False
 
             if not pressed_direction_keys_queue:
-                last_direction = self.game.snake.directions[-1][-1]         # only last direction: 'ru' -> 'u'
+                last_direction = self.game.snake.directions[-1]         
                 move_event = self.game.snake.move(last_direction)
             else:
                 while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
@@ -182,6 +184,8 @@ class GameView:
                     play_sound(assets.eat_sound)
                     self.game.score += 1
                     self.game.spawn_sweet()
+                elif move_event == "PORTAL":
+                    play_sound(assets.portal_sound)
 
                 pygame.display.flip()
 
