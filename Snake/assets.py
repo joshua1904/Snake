@@ -26,10 +26,10 @@ snake_part = {
     'ul': pygame.image.load(Path(SOURCE, "pictures/textures/corner_ul.bmp"))
 }
 snake_head = {
-    'r': pygame.image.load(Path(SOURCE, "pictures/textures/head_r.bmp")),
+    'r': pygame.image.load(Path(SOURCE, "pictures/textures/head_l.bmp")),
     'u': pygame.image.load(Path(SOURCE, "pictures/textures/head_u.bmp")),
     'd': pygame.image.load(Path(SOURCE, "pictures/textures/head_d.bmp")),
-    'l': pygame.image.load(Path(SOURCE, "pictures/textures/head_l.bmp"))
+    'l': pygame.image.load(Path(SOURCE, "pictures/textures/head_r.bmp"))
 }
 snake_end = {
     'r': pygame.image.load(Path(SOURCE, "pictures/textures/end_r.bmp")),

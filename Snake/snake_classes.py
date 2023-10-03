@@ -53,6 +53,9 @@ class BoardPosition:
             raise (TypeError('Can only subtract BoardPosition, XYTuple oder tuple (len==2) from BoardPosition.'))
         return BoardPosition(new_x, new_y, self.board)
 
+    def __repr__(self):
+        return f"BP({self.x}, {self.y})"
+
 
 @dataclass
 class BoardCell:
@@ -69,7 +72,8 @@ class Snake:
     """
     The snake
     """
-    DIRECTIONS = {'l': (-1, 0), 'r': (1, 0), 'u': (0, -1), 'd': (0, 1)}
+    DIRECTIONS = {'l': (-1, 0), 'u': (0, -1), 'r': (1, 0), 'd': (0, 1)}
+    OPPOSITES = ['l', 'u', 'r', 'd']            # OPPOSITES[i-2] is opposite direction of OPPOSITES[i]
 
     def __init__(self, board: GameBoard, start_pos: BoardPosition, start_direction: str):
         """
@@ -84,7 +88,7 @@ class Snake:
         Save the new direction to self.directions
         :param new_direction: the direction to move from the current head position
         """
-        last_direction = self.directions[-1]
+        last_direction = self.directions[-1][-1]
         if last_direction != new_direction:
             self.directions.append(f"{last_direction}{new_direction}")
         else:
@@ -95,6 +99,12 @@ class Snake:
         Saves a new snake-part to the snake in front (the head)
         and removes the last part (the tail)
         """
+        # do not move in opposite direction
+        last_direction = self.directions[-1][-1]
+        i = Snake.OPPOSITES.index(last_direction)
+        if direction == Snake.OPPOSITES[i - 2]:
+            direction = last_direction
+
         last_position = self.positions[-1]
         new_position = last_position + Snake.DIRECTIONS[direction]
 
@@ -104,7 +114,6 @@ class Snake:
 
         # Check for portals
         elif new_position in self.board.portals:
-            # play_sound(portal_sound)
             start_portal = self.board.portals[new_position]
             target_portal = start_portal.partner
             new_position = target_portal.pos + Snake.DIRECTIONS[direction]
@@ -114,12 +123,15 @@ class Snake:
         self._save_direction(direction)
 
         # Check for sweet -> only pop tail if not eaten
-        if new_position != self.board.sweet.pos:
-            self.positions.popleft()
-            self.directions.popleft()
-            return "MOVE"
-        else:
+        if new_position == self.board.game.sweet.pos:
             return "EATEN"
+
+        self.positions.popleft()
+        self.directions.popleft()
+        print(self.directions)
+        print(self.positions)
+
+        return "MOVE"
 
 
 class GameBoard:
@@ -127,8 +139,9 @@ class GameBoard:
     The current game-board
     """
 
-    def __init__(self, map_list: List[List[Any]]):
+    def __init__(self, game: Game, map_list: List[List[Any]]):
         """"""
+        self.game: Game = game
         dim_x, dim_y = len(map_list[0]), len(map_list)
         self.dim = XYTuple(dim_x, dim_y)
         self.walls: Dict[BoardPosition, BoardCell] = {}
@@ -136,7 +149,6 @@ class GameBoard:
         self.sweet: BoardCell
 
         self._load_map_from_list(map_list)
-        self.sweet = self.spawn_sweet()
 
     def _load_map_from_list(self, map_list: List[List[Any]]):
         """
@@ -149,10 +161,9 @@ class GameBoard:
         portals_temp_dict: Dict[int, Optional[BoardCell]] = {}        # to find partner-portals
 
         for row_counter, row in enumerate(map_list):
-            for col_counter, col in enumerate(row):
+            for col_counter, cell_id in enumerate(row):
 
-                if col.isdigit():           # ignore non-digit cells (e.g. snake)
-                    cell_id = int(col)
+                if isinstance(cell_id, int):           # ignore non-digit cells (e.g. snake)
 
                     # Walls
                     if cell_id in range(1, 4):
@@ -179,28 +190,18 @@ class GameBoard:
         assert all(v is None for v in portals_temp_dict.values()), (f"There are portals with no partner in "
                                                                     f"map_list: {map_list}")
 
-    def spawn_sweet(self):
-        """
-        Spawn a sweet, not in walls, not in portals and not in TODO: snake positions
-        """
-        sweet_x = random.randint(0, self.dim.x)
-        sweet_y = random.randint(0, self.dim.y)
-        sweet_pos = BoardPosition(sweet_x, sweet_y, self)
-        if sweet_pos not in self.walls and sweet_pos not in self.portals:
-            sweet_cell = BoardCell(sweet_pos, "SWEET", 1)
-            return sweet_cell
-        else:
-            return self.spawn_sweet()
-
 
 class Game:
     """The game"""
 
     def __init__(self, map_list: List[List[Any]]):
-        self.board = GameBoard(map_list)
+        self.board = GameBoard(self, map_list)
         self.snake: Snake
+        self.sweet: BoardCell
+        self.score = 0
 
         self._init_snake(map_list)
+        self.spawn_sweet()
 
     def _init_snake(self, map_list: List[List[Any]]):
         for row_counter, row in enumerate(map_list):
@@ -208,6 +209,23 @@ class Game:
                 if cell_id in ('l', 'r', 'u', 'd'):
                     pos = BoardPosition(col_counter, row_counter, self.board)
                     self.snake = Snake(self.board, pos, cell_id)
+
+    def spawn_sweet(self):
+        """
+        Spawn a sweet, not in walls, not in portals and not in snake positions
+        """
+        sweet_x = random.randint(0, self.board.dim.x)
+        sweet_y = random.randint(0, self.board.dim.y)
+        sweet_pos = BoardPosition(sweet_x, sweet_y, self.board)
+
+        if (sweet_pos not in self.board.walls.keys()
+                and sweet_pos not in self.board.portals.keys()
+                and sweet_pos not in self.snake.positions):
+
+            self.sweet = BoardCell(sweet_pos, "SWEET", 1)
+            return None
+        else:
+            return self.spawn_sweet()       # recursive
 
 
 

@@ -1,6 +1,8 @@
 """
 The front-end with pygame
 """
+import itertools
+from collections import deque
 from pathlib import Path
 
 import snake_classes
@@ -12,10 +14,24 @@ SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 SCREEN_WIDTH, SCREEN_HEIGHT = SCREEN.get_size()
 
 
+def play_sound(sound):
+    pygame.mixer.Sound.play(sound)
+    pygame.mixer.music.stop()
+
+
 class GameView:
     """
     The view of a single game
     """
+    MIDDLE_PARTS = {
+        'l': 'rl', 'r': 'rl',
+        'u': 'ud', 'd': 'ud',
+        'rd': 'dr', 'ul': 'dr',
+        'dr': 'ul', 'lu': 'ul',
+        'ru': 'ur', 'dl': 'ur',
+        'ur': 'dl', 'ld': 'dl'
+    }
+
     def __init__(self, game: snake_classes.Game, cell_size=30):
         self.game = game
         self.cell_size = cell_size
@@ -82,9 +98,11 @@ class GameView:
         """
         snake = self.game.snake
         head_pos = snake.positions[-1]
-        head_dir = snake.directions[-1]
+        head_dir = snake.directions[-1][-1]                         # only last direction: 'ru' -> 'u'
         end_pos = snake.positions[0]
-        end_dir = snake.directions[0]
+        end_dir = snake.directions[0][-1]                           # only last direction: 'ru' -> 'u'
+        middle_pos = itertools.islice(snake.positions, 1, len(snake.positions) - 1)
+        middle_dir = itertools.islice(snake.directions, 1, len(snake.positions) - 1)
 
         # Draw head
         self.draw_to_board(assets.snake_head[head_dir], head_pos.x, head_pos.y, SCREEN)
@@ -93,31 +111,109 @@ class GameView:
         self.draw_to_board(assets.snake_end[end_dir], end_pos.x, end_pos.y, SCREEN)
 
         # Draw middle parts
-        for part_pos, part_dir in zip(snake.positions[1:-1], snake.directions[1:-1]):
-            if part_dir in ('r', 'l'):
-                part_dir = 'rl'
-            elif part_dir in ('u', 'd'):
-                part_dir = 'ud'
-            self.draw_to_board(assets.snake_end[part_dir], part_pos.x, part_pos.y, SCREEN)
+        for part_pos, part_dir in zip(middle_pos, middle_dir):
+            self.draw_to_board(assets.snake_part[GameView.MIDDLE_PARTS[part_dir]], part_pos.x, part_pos.y, SCREEN)
+
+    def draw_map(self):
+        """Draw the background and map to the screen"""
+        SCREEN.blit(self.map_surface, (0, 0))
+
+    def draw_sweet(self):
+        """Draw the sweet on the screen"""
+        sweet = self.game.sweet
+        self.draw_to_board(assets.sweet_image, sweet.pos.x, sweet.pos.y, SCREEN)
 
     def game_loop(self):
         """the main loop"""
 
-        SCREEN.blit(self.map_surface, (0, 0))
+        # allow only certain events (no mouse)
+        pygame.event.set_allowed((pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP))
 
-        while True:
-            pygame.display.flip()
-            CLOCK.tick(10)  # limits FPS to 60
+        # save pressed keys in queue
+        pressed_direction_keys_queue = deque(list())
+
+        speed = False
+        speed_count = 0
+        last_direction = self.game.snake.directions[-1][-1]     # only last direction: 'ru' -> 'u'
+        wanted_direction = last_direction
+        running = True
+
+        while running:
+            # poll for events
+            # pygame.QUIT event means the user clicked X to close your window
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        speed = True
+                    elif event.key == pygame.K_LEFT:
+                        pressed_direction_keys_queue.append('l')
+                    elif event.key == pygame.K_RIGHT:
+                        pressed_direction_keys_queue.append('r')
+                    elif event.key == pygame.K_UP:
+                        pressed_direction_keys_queue.append('u')
+                    elif event.key == pygame.K_DOWN:
+                        pressed_direction_keys_queue.append('d')
+
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_SPACE:
+                        speed = False
+
+            if not pressed_direction_keys_queue:
+                last_direction = self.game.snake.directions[-1][-1]         # only last direction: 'ru' -> 'u'
+                move_event = self.game.snake.move(last_direction)
+            else:
+                while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
+                    wanted_direction = pressed_direction_keys_queue.popleft()
+                    if wanted_direction != last_direction:
+                        last_direction = wanted_direction
+                        break
+                move_event = self.game.snake.move(wanted_direction)
+
+            if move_event != "CRASH":
+
+                self.draw_map()
+                self.draw_sweet()
+                self.draw_snake()
+
+                if move_event == "EATEN":
+                    play_sound(assets.eat_sound)
+                    self.game.score += 1
+                    self.game.spawn_sweet()
+
+                pygame.display.flip()
+
+            else:
+                play_sound(assets.damage_sound)
+                return
+
+            if speed:
+                if speed_count % 10 == 0:
+                    play_sound(assets.boost_sound)
+                CLOCK.tick(10)
+                speed_count += 1
+            else:
+                CLOCK.tick(5)  # limits FPS to 60
+                speed_count = 0
 
 
 if __name__ == "__main__":
 
-    map_list = [[1, 1, 1, 0, 0, 0, 0],
-               [1, 0, 0, 0, 1, 1, 0],
-               [1, 4, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 4, 0, 1],
-               [0, 1, 1, 0, 0, 0, 1],
-               [0, 0, 0, 0, 1, 1, 1]]
+    map_list = [[1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 'r', 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1]]
 
     game = snake_classes.Game(map_list)
 
