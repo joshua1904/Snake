@@ -1,5 +1,6 @@
-from Snake.assets import *
-from Snake import snake, utils
+from snake.assets import *
+from snake import snake
+import utils
 
 screen = pygame.display.set_mode((0, 0), FULLSCREEN)
 def draw_mini_map(map_name, start_pos):

@@ -5,7 +5,7 @@ Utils - import export
 import csv
 import json
 from pathlib import Path
-from Snake.assets import SOURCE
+from snake.assets import SOURCE
 
 
 def get_map(map_name):
@@ -20,7 +20,7 @@ def set_highscore(map_str, score):
     highscore_json = get_json()
     highscore_json[map_str] = score
     print(highscore_json)
-    with open(Path(SOURCE, "highscore.json").absolute(), "w") as f:
+    with open(Path(SOURCE, "snake/highscore.json").absolute(), "w") as f:
         json.dump(highscore_json, f)
 
 
@@ -32,7 +32,7 @@ def get_highscore(map_str):
 
 
 def get_json():
-    with open(Path(SOURCE, "highscore.json"), "r") as f:
+    with open(Path(SOURCE, "snake/highscore.json"), "r") as f:
         return json.load(f)
 
 

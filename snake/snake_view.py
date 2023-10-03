@@ -6,8 +6,7 @@ from collections import deque
 import snake_classes
 import assets
 import pygame
-
-from Snake import utils
+import utils
 
 CLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
