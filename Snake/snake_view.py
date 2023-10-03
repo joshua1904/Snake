@@ -94,9 +94,7 @@ if __name__ == "__main__":
                [0, 1, 1, 0, 0, 0, 1],
                [0, 0, 0, 0, 1, 1, 1]]
 
-    board = snake_classes.GameBoard(map_list)
-
-    game = snake_classes.Game(board)
+    game = snake_classes.Game(map_list)
 
     game_view = GameView(game)
 
