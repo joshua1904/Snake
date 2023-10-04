@@ -6,15 +6,18 @@ import csv
 
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 walls = list()
 removed_walls = list()
 SIZE = 30
 
+
 def draw_rect(x: int, y: int, color):
     pygame.draw.rect(screen, color, pygame.Rect(x * SIZE, y * SIZE, SIZE, SIZE))
+
+
 def get_map():
     with open("maps/map1.csv", "r") as f:
         return list(csv.reader(f, delimiter=";"))
@@ -42,7 +45,10 @@ def add_to_map():
             writer = csv.writer(f, delimiter=";")
             writer.writerow(row)
 
+
 MAP = get_map()
+
+
 def spawn_portal() -> tuple:
     for row_counter, row in enumerate(MAP):
         if "2" in row:
@@ -52,12 +58,18 @@ def spawn_portal() -> tuple:
     return portal1, portal2
 
 portal1, portal2 = spawn_portal()
+
+
 def spawn_walls():
     for row_counter, row in enumerate(MAP):
         for field_counter, field in enumerate(row):
             if field == "1":
                 walls.append((field_counter, row_counter))
+
+
 spawn_walls()
+
+
 def draw_rects():
     for row_count, row in enumerate(walls):
         draw_rect(row[0], row[1], "white")
@@ -65,6 +77,7 @@ def draw_rects():
         draw_rect(portal1[0], portal1[1], "orange")
     if portal2:
         draw_rect(portal2[0], portal2[1], "orange")
+
 
 def draw(pos: tuple, delete=False):
     global portal1, portal2
@@ -116,3 +129,4 @@ while running:
     clock.tick(60)  # limits FPS to 60
 pygame.quit()
 add_to_map()
+

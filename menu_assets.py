@@ -1,9 +1,10 @@
 import pygame
 from pathlib import Path
 
+from settings import SOURCE
+
 pygame.init()
 
-SOURCE = Path("")
 
 # Font
 font = pygame.font.SysFont("comicsansms", 50)

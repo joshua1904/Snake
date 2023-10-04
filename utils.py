@@ -6,7 +6,8 @@ import csv
 import json
 from pathlib import Path
 
-SOURCE = Path("")
+from settings import SOURCE
+
 MAP_PATH = "maps/"
 MAP_FILE_ENDING = ".csv"
 
