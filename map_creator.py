@@ -1,13 +1,13 @@
 import random
 import time
 
-import pygame
+import pygame as pg
 import csv
 
 # pygame setup
-pygame.init()
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-clock = pygame.time.Clock()
+pg.init()
+screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+clock = pg.time.Clock()
 running = True
 walls = list()
 removed_walls = list()
@@ -15,7 +15,7 @@ SIZE = 30
 
 
 def draw_rect(x: int, y: int, color):
-    pygame.draw.rect(screen, color, pygame.Rect(x * SIZE, y * SIZE, SIZE, SIZE))
+    pg.draw.rect(screen, color, pg.Rect(x * SIZE, y * SIZE, SIZE, SIZE))
 
 
 def get_map():
@@ -107,26 +107,26 @@ def draw(pos: tuple, delete=False):
 
 while running:
     # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
-    for event in pygame.event.get():
-        keys = pygame.key.get_pressed()
-        mouse = pygame.mouse.get_pressed()
-        if keys[pygame.K_DELETE]:
+    # pg.QUIT event means the user clicked X to close your window
+    for event in pg.event.get():
+        keys = pg.key.get_pressed()
+        mouse = pg.mouse.get_pressed()
+        if keys[pg.K_DELETE]:
             running = False
         if mouse[0]:
-            pos = pygame.mouse.get_pos()
+            pos = pg.mouse.get_pos()
             draw(pos)
         if mouse[2]:
-            pos = pygame.mouse.get_pos()
+            pos = pg.mouse.get_pos()
             draw(pos, delete=True)
     # move_right()
     # fill the screen with a color to wipe away anything from last frame
         screen.fill("black")
         # flip() the display to put your work on screen
         draw_rects()
-        pygame.display.flip()
+        pg.display.flip()
 
     clock.tick(60)  # limits FPS to 60
-pygame.quit()
+pg.quit()
 add_to_map()
 

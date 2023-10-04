@@ -1,11 +1,57 @@
-import pygame
-import menu_assets
+import pygame as pg
+import menu_assets as ma
 import utils
 import snake.snake_view as sv
 
-CLOCK = pygame.time.Clock()
-SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+CLOCK = pg.time.Clock()
+SCREEN = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 SCREEN_WIDTH, SCREEN_HEIGHT = SCREEN.get_size()
+
+COLOR_INACTIVE = pg.Color('lightskyblue3')
+COLOR_ACTIVE = pg.Color('dodgerblue2')
+
+
+class InputBox:
+
+    def __init__(self, x, y, w, h, text=''):
+        self.rect = pg.Rect(x, y, w, h)
+        self.color = COLOR_INACTIVE
+        self.text = text
+        self.txt_surface = ma.font.render(text, True, self.color)
+        self.active = False
+
+    def handle_event(self, event):
+        if event.type == pg.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                # Toggle the active variable.
+                self.active = not self.active
+            else:
+                self.active = False
+            # Change the current color of the input box.
+            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+        if event.type == pg.KEYDOWN:
+            if self.active:
+                if event.key == pg.K_RETURN:
+                    print(self.text)
+                    self.text = ''
+                elif event.key == pg.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+                # Re-render the text.
+                self.txt_surface = ma.font.render(self.text, True, self.color)
+
+    def update(self):
+        # Resize the box if the text is too long.
+        width = max(200, self.txt_surface.get_width()+10)
+        self.rect.w = width
+
+    def draw(self, screen):
+        # Blit the text.
+        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        # Blit the rect.
+        pg.draw.rect(screen, self.color, self.rect, 2)
 
 
 def draw_mini_map(map_name, start_pos, mini_size=10):
@@ -19,8 +65,8 @@ def draw_mini_map(map_name, start_pos, mini_size=10):
 
     game_board = sv.sc.GameBoard(map_list)
 
-    wall_part_mini = pygame.transform.scale(menu_assets.wall_image, (mini_size, mini_size))
-    portal_images_mini = [pygame.transform.scale(image, (mini_size, mini_size)) for image in menu_assets.portal_images.values()]
+    wall_part_mini = pg.transform.scale(ma.wall_image, (mini_size, mini_size))
+    portal_images_mini = [pg.transform.scale(image, (mini_size, mini_size)) for image in ma.portal_images.values()]
 
     for wall_pos in game_board.walls:
         SCREEN.blit(wall_part_mini, (start_pos[0] + wall_pos.x * mini_size, start_pos[1] + wall_pos.y * mini_size))
@@ -29,45 +75,45 @@ def draw_mini_map(map_name, start_pos, mini_size=10):
 
 
 def play_sound(sound):
-    pygame.mixer.Sound.play(sound)
-    pygame.mixer.music.stop()
+    pg.mixer.Sound.play(sound)
+    pg.mixer.music.stop()
 
 
 def intro():
     SCREEN.fill("black")
     highscore_map_1 = utils.get_highscore("map1")
     highscore_map_2 = utils.get_highscore("map3")
-    text = menu_assets.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
+    text = ma.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
     text_rect = text.get_rect(center=(1920 / 2, 100))
-    map1_text = menu_assets.font.render(f"(1) Highscore: {highscore_map_1}", True, "white")
-    map2_text = menu_assets.font.render(f"(2)Highscore: {highscore_map_2}", True, "white")
+    map1_text = ma.font.render(f"(1) Highscore: {highscore_map_1}", True, "white")
+    map2_text = ma.font.render(f"(2)Highscore: {highscore_map_2}", True, "white")
     map1_text_rect = map1_text.get_rect()
     map2_text_rect = map2_text.get_rect()
     map1_text_rect.center = (520, 780)
     map2_text_rect.center = (1400, 780)
     draw_mini_map("map1", (200, 360))
     draw_mini_map("map3", (1080, 360))
-    text = menu_assets.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
+    text = ma.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
     SCREEN.blit(text, text_rect)
     SCREEN.blit(map1_text, map1_text_rect)
     SCREEN.blit(map2_text, map2_text_rect)
 
     while intro:
-        keys = pygame.key.get_pressed()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        keys = pg.key.get_pressed()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
                 return
 
-            if keys[pygame.K_1]:
-                play_sound(menu_assets.click_sound)
+            if keys[pg.K_1]:
+                play_sound(ma.click_sound)
                 return "map1"
-            if keys[pygame.K_2]:
-                play_sound(menu_assets.click_sound)
+            if keys[pg.K_2]:
+                play_sound(ma.click_sound)
                 return "map3"
-            if keys[pygame.K_DELETE]:
+            if keys[pg.K_DELETE]:
                 return
 
-        pygame.display.update()
+        pg.display.update()
         CLOCK.tick(20)
 
 

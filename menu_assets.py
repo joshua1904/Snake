@@ -1,22 +1,22 @@
-import pygame
+import pygame as pg
 from pathlib import Path
 
 from settings import SOURCE
 
-pygame.init()
+pg.init()
 
 
 # Font
-font = pygame.font.SysFont("comicsansms", 50)
+font = pg.font.SysFont("comicsansms", 50)
 
 # Sounds
-click_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/click.wav").resolve())
+click_sound = pg.mixer.Sound(Path(SOURCE, "sounds/click.wav").resolve())
 
 # Mini-Map
-wall_image = pygame.image.load(Path(SOURCE, "snake/images/textures/wall.bmp").resolve())
+wall_image = pg.image.load(Path(SOURCE, "snake/images/textures/wall.bmp").resolve())
 portal_images = {
-    1: pygame.image.load(Path(SOURCE, "snake/images/textures/portal_1.bmp").resolve()),
-    2: pygame.image.load(Path(SOURCE, "snake/images/textures/portal_2.bmp").resolve()),
-    3: pygame.image.load(Path(SOURCE, "snake/images/textures/portal_3.bmp").resolve()),
+    1: pg.image.load(Path(SOURCE, "snake/images/textures/portal_1.bmp").resolve()),
+    2: pg.image.load(Path(SOURCE, "snake/images/textures/portal_2.bmp").resolve()),
+    3: pg.image.load(Path(SOURCE, "snake/images/textures/portal_3.bmp").resolve()),
 }
 

@@ -5,12 +5,12 @@ from collections import deque
 
 import snake.snake_classes as sc
 import snake.snake_assets as sa
-import pygame
+import pygame as pg
 
 
 def play_sound(sound):
-    pygame.mixer.Sound.play(sound)
-    pygame.mixer.music.stop()
+    pg.mixer.Sound.play(sound)
+    pg.mixer.music.stop()
 
 
 class GameView:
@@ -26,7 +26,7 @@ class GameView:
         'ur': 'dl', 'ld': 'dl'
     }
 
-    def __init__(self, screen: pygame.Surface, clock: pygame.time.Clock,
+    def __init__(self, screen: pg.Surface, clock: pg.time.Clock,
                  game: sc.Game, cell_size=30, base_speed=10):
         self.screen = screen
         self.screen_width, self.screen_height = screen.get_size()
@@ -38,7 +38,7 @@ class GameView:
 
         self.map_width_px = self.game.board.dim.x * self.cell_size
         self.map_height_px = self.game.board.dim.y * self.cell_size
-        self.map_surface: pygame.Surface        # the (immutable) background with walls and portals
+        self.map_surface: pg.Surface        # the (immutable) background with walls and portals
 
         self.background_image = sa.wall_image
         self._init_map_surface()
@@ -49,7 +49,7 @@ class GameView:
         self.map_surface.fill("black")
 
         # Background with border
-        border = pygame.Surface((self.map_width_px + (2 * self.cell_size),
+        border = pg.Surface((self.map_width_px + (2 * self.cell_size),
                                  self.map_height_px + (2 * self.cell_size)))
         border.fill("darkorchid4")
         self.draw_to_board(border, -1, -1, self.map_surface)
@@ -64,7 +64,7 @@ class GameView:
         for portal_cell in self.game.board.portals.values():
             self.draw_to_board(sa.portal_images[portal_cell.subtype], portal_cell.pos.x, portal_cell.pos.y, self.map_surface)
 
-    def _create_background(self, image: pygame.image, tile_size=(360, 360), darker=90) -> pygame.Surface:
+    def _create_background(self, image: pg.image, tile_size=(360, 360), darker=90) -> pg.Surface:
         """
         Generate Background-Image
         :param image: the image to use for the background
@@ -72,15 +72,15 @@ class GameView:
         :param darker: r, g, b values to be subtracted from image (0-255)
         :return: the background surface (as big as the map)
         """
-        scaled_image = pygame.transform.smoothscale(image, tile_size)
-        scaled_image.fill((darker, darker, darker), special_flags=pygame.BLEND_RGB_SUB)
-        background_surface = pygame.Surface((self.map_width_px, self.map_height_px))
+        scaled_image = pg.transform.smoothscale(image, tile_size)
+        scaled_image.fill((darker, darker, darker), special_flags=pg.BLEND_RGB_SUB)
+        background_surface = pg.Surface((self.map_width_px, self.map_height_px))
         for x in range(0, self.map_width_px // tile_size[0] + 1):
             for y in range(0, self.map_height_px // tile_size[1] + 1):
                 background_surface.blit(scaled_image, (x * tile_size[0], y * tile_size[1]))
         return background_surface
 
-    def draw_to_board(self, image: pygame.image, x: int, y: int, surface: pygame.Surface):
+    def draw_to_board(self, image: pg.image, x: int, y: int, surface: pg.Surface):
         """
         :param image: the image to draw
         :param x: x-Coord. on the board (in cells)
@@ -133,7 +133,7 @@ class GameView:
         """the main loop"""
 
         # allow only certain events (no mouse)
-        pygame.event.set_allowed((pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP))
+        pg.event.set_allowed((pg.QUIT, pg.KEYDOWN, pg.KEYUP))
 
         # save pressed keys in queue
         pressed_direction_keys_queue = deque(list())
@@ -146,24 +146,24 @@ class GameView:
 
         while running:
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
                     return
 
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_SPACE:
                         speed = True
-                    elif event.key == pygame.K_LEFT:
+                    elif event.key == pg.K_LEFT:
                         pressed_direction_keys_queue.append('l')
-                    elif event.key == pygame.K_RIGHT:
+                    elif event.key == pg.K_RIGHT:
                         pressed_direction_keys_queue.append('r')
-                    elif event.key == pygame.K_UP:
+                    elif event.key == pg.K_UP:
                         pressed_direction_keys_queue.append('u')
-                    elif event.key == pygame.K_DOWN:
+                    elif event.key == pg.K_DOWN:
                         pressed_direction_keys_queue.append('d')
 
-                elif event.type == pygame.KEYUP:
-                    if event.key == pygame.K_SPACE:
+                elif event.type == pg.KEYUP:
+                    if event.key == pg.K_SPACE:
                         speed = False
 
             if not pressed_direction_keys_queue:
@@ -194,7 +194,7 @@ class GameView:
                     play_sound(sa.portal_sound)
 
                 self.draw_score()
-                pygame.display.flip()
+                pg.display.flip()
 
             else:
                 play_sound(sa.damage_sound)
