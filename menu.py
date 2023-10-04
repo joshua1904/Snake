@@ -47,11 +47,11 @@ class InputBox:
                     self.text = self.text[:-1]
                 else:
                     char = event.unicode
-                    if ((char.isascii() and char.isalnum()) or char in '!?.,-()<>') and len(self.text) <= self.max_len:
+                    if ((char.isascii() and char.isalnum()) or char in ' !?.,-()<>') and len(self.text) <= self.max_len:
                         self.text += char
 
-                # Re-render the text.
-                self.txt_surface = ma.font_small.render(self.text, True, self.color)
+            # Re-render the text.
+            self.txt_surface = ma.font_small.render(self.text, True, self.color)
 
     def update(self):
         # Resize the box if the text is too long.
@@ -153,23 +153,23 @@ if __name__ == "__main__":
             old_winner = utils.get_highscore(map_name)["name"]
             old_message = utils.get_highscore(map_name)["message"]
 
-            highscore_msg_popup = pg.Surface((800, 700))
-            highscore_msg_popup.fill((230, 30, 30))
-            highscore_msg_popup.fill((30, 30, 30), (50, 50, 700, 600))
+            highscore_msg_popup = pg.Surface((1200, 700))
+            highscore_msg_popup.fill((30, 230, 30))
+            highscore_msg_popup.fill((30, 30, 30), (50, 50, 1100, 600))
             highscore_msg_popup.blit(
-                ma.font_small.render("Du hast einen neuen Highscore für diese map erreicht!", True, "white"),
+                ma.font_small.render(f"Du hast einen neuen Highscore von {game.highscore} für diese map erreicht!", True, "white"),
                 (100, 100))
             highscore_msg_popup.blit(
                 ma.font_small.render(f"{old_winner} hat dir eine Nachricht hinterlassen:", True, "white"),
                 (100, 150))
-            highscore_msg_popup.blit(ma.font_small.render(f"\"{old_message}\"", True, "white"), (100, 200))
-            highscore_msg_popup.blit(ma.font_small.render("Dein Name:", True, "white"), (100, 250))
-            input_box1 = InputBox(100, 300, 200, 32, active=True, max_len=12, text="Noob")
+            highscore_msg_popup.blit(ma.font_small.render(f"\"{old_message}\"", True, "salmon"), (100, 225))
+            highscore_msg_popup.blit(ma.font_small.render("Dein Name:", True, "white"), (100, 300))
+            input_box1 = InputBox(100, 350, 200, 32, active=True, max_len=12, text="Noob")
 
-            highscore_msg_popup.blit(ma.font_small.render("Deine Nachricht:", True, "white"), (100, 350))
-            input_box2 = InputBox(100, 400, 600, 32, max_len=36, text="Ich bin ein Noob")
+            highscore_msg_popup.blit(ma.font_small.render("Deine Nachricht:", True, "white"), (100, 400))
+            input_box2 = InputBox(100, 450, 1000, 32, max_len=64, text="Ich bin ein Noob")
 
-            highscore_msg_popup.blit(ma.font_small.render("- drücke die Strg/Ctrl Taste um fortzufahren -", True, "white"), (100, 500))
+            highscore_msg_popup.blit(ma.font_small.render("- drücke die Strg/Ctrl Taste um fortzufahren -", True, "white"), (100, 550))
 
             input_boxes = [input_box1, input_box2]
             done = False
@@ -189,7 +189,7 @@ if __name__ == "__main__":
                 # for box in input_boxes:
                     # box.update()
 
-                SCREEN.blit(highscore_msg_popup, (SCREEN_WIDTH // 2 - 400, SCREEN_HEIGHT // 2 - 400))
+                SCREEN.blit(highscore_msg_popup, (SCREEN_WIDTH // 2 - 600, SCREEN_HEIGHT // 2 - 400))
                 for box in input_boxes:
                     box.draw(highscore_msg_popup)
 
