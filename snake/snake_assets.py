@@ -9,44 +9,44 @@ SOURCE = Path("snake")
 font = pygame.font.SysFont("comicsansms", 50)
 
 # Sounds
-eat_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/eat_sound.wav"))
-damage_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/damage.wav"))
-portal_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/portal.wav"))
-beat_highscore_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/beat_highscore.wav"))
-boost_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/boost.wav"))
+eat_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/eat_sound.wav").resolve())
+damage_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/damage.wav").resolve())
+portal_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/portal.wav").resolve())
+beat_highscore_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/beat_highscore.wav").resolve())
+boost_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/boost.wav").resolve())
 
 # Snake
 snake_part = {
-    'rl': pygame.image.load(Path(SOURCE, "images/textures/part_rl.bmp")),
-    'ud': pygame.image.load(Path(SOURCE, "images/textures/part_ud.bmp")),
-    'dr': pygame.image.load(Path(SOURCE, "images/textures/corner_dr.bmp")),
-    'dl': pygame.image.load(Path(SOURCE, "images/textures/corner_dl.bmp")),
-    'ur': pygame.image.load(Path(SOURCE, "images/textures/corner_ur.bmp")),
-    'ul': pygame.image.load(Path(SOURCE, "images/textures/corner_ul.bmp"))
+    'rl': pygame.image.load(Path(SOURCE, "images/textures/part_rl.bmp").resolve()),
+    'ud': pygame.image.load(Path(SOURCE, "images/textures/part_ud.bmp").resolve()),
+    'dr': pygame.image.load(Path(SOURCE, "images/textures/corner_dr.bmp").resolve()),
+    'dl': pygame.image.load(Path(SOURCE, "images/textures/corner_dl.bmp").resolve()),
+    'ur': pygame.image.load(Path(SOURCE, "images/textures/corner_ur.bmp").resolve()),
+    'ul': pygame.image.load(Path(SOURCE, "images/textures/corner_ul.bmp").resolve())
 }
 snake_head = {
-    'r': pygame.image.load(Path(SOURCE, "images/textures/head_l.bmp")),
-    'u': pygame.image.load(Path(SOURCE, "images/textures/head_u.bmp")),
-    'd': pygame.image.load(Path(SOURCE, "images/textures/head_d.bmp")),
-    'l': pygame.image.load(Path(SOURCE, "images/textures/head_r.bmp"))
+    'r': pygame.image.load(Path(SOURCE, "images/textures/head_l.bmp").resolve()),
+    'u': pygame.image.load(Path(SOURCE, "images/textures/head_u.bmp").resolve()),
+    'd': pygame.image.load(Path(SOURCE, "images/textures/head_d.bmp").resolve()),
+    'l': pygame.image.load(Path(SOURCE, "images/textures/head_r.bmp").resolve())
 }
 snake_end = {
-    'r': pygame.image.load(Path(SOURCE, "images/textures/end_r.bmp")),
-    'u': pygame.image.load(Path(SOURCE, "images/textures/end_u.bmp")),
-    'd': pygame.image.load(Path(SOURCE, "images/textures/end_d.bmp")),
-    'l': pygame.image.load(Path(SOURCE, "images/textures/end_l.bmp"))
+    'r': pygame.image.load(Path(SOURCE, "images/textures/end_r.bmp").resolve()),
+    'u': pygame.image.load(Path(SOURCE, "images/textures/end_u.bmp").resolve()),
+    'd': pygame.image.load(Path(SOURCE, "images/textures/end_d.bmp").resolve()),
+    'l': pygame.image.load(Path(SOURCE, "images/textures/end_l.bmp").resolve())
 }
 
 # Map
-wall_image = pygame.image.load(Path(SOURCE, "images/textures/wall.bmp"))
+wall_image = pygame.image.load(Path(SOURCE, "images/textures/wall.bmp").resolve())
 
 portal_images = {
-    1: pygame.image.load(Path(SOURCE, "images/textures/portal_1.bmp")),
-    2: pygame.image.load(Path(SOURCE, "images/textures/portal_2.bmp")),
-    3: pygame.image.load(Path(SOURCE, "images/textures/portal_3.bmp")),
+    1: pygame.image.load(Path(SOURCE, "images/textures/portal_1.bmp").resolve()),
+    2: pygame.image.load(Path(SOURCE, "images/textures/portal_2.bmp").resolve()),
+    3: pygame.image.load(Path(SOURCE, "images/textures/portal_3.bmp").resolve()),
 }
 
-sweet_image = pygame.image.load(Path(SOURCE, "images/textures/fruit.bmp"))
+sweet_image = pygame.image.load(Path(SOURCE, "images/textures/fruit.bmp").resolve())
 
 # make black pixels transparent
 for image in snake_part.values():
