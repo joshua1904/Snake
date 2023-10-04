@@ -57,12 +57,12 @@ class GameView:
         self.draw_to_board(background_surface, 0, 0, self.map_surface)
 
         # Walls
-        for wall in self.game.board.walls:
-            self.draw_to_board(sa.wall_image, wall.x, wall.y, self.map_surface)
+        for wall_pos in self.game.board.walls:
+            self.draw_to_board(sa.wall_image, wall_pos.x, wall_pos.y, self.map_surface)
 
         # Portals
-        for portal in self.game.board.portals:
-            self.draw_to_board(sa.portal_image, portal.x, portal.y, self.map_surface)
+        for portal_cell in self.game.board.portals.values():
+            self.draw_to_board(sa.portal_images[portal_cell.subtype], portal_cell.pos.x, portal_cell.pos.y, self.map_surface)
 
     def _create_background(self, image: pygame.image, tile_size=(360, 360), darker=90) -> pygame.Surface:
         """

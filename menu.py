@@ -20,12 +20,12 @@ def draw_mini_map(map_name, start_pos, mini_size=10):
     game_board = sv.sc.GameBoard(map_list)
 
     wall_part_mini = pygame.transform.scale(menu_assets.wall_image, (mini_size, mini_size))
-    portal_image_mini = pygame.transform.scale(menu_assets.portal_image, (mini_size, mini_size))
+    portal_images_mini = [pygame.transform.scale(image, (mini_size, mini_size)) for image in menu_assets.portal_images.values()]
 
-    for wall in game_board.walls:
-        SCREEN.blit(wall_part_mini, (start_pos[0] + wall.x * mini_size, start_pos[1] + wall.y * mini_size))
-    for portal in game_board.portals:
-        SCREEN.blit(portal_image_mini, (start_pos[0] + portal.x * mini_size, start_pos[1] + portal.y * mini_size))
+    for wall_pos in game_board.walls:
+        SCREEN.blit(wall_part_mini, (start_pos[0] + wall_pos.x * mini_size, start_pos[1] + wall_pos.y * mini_size))
+    for portal_cell in game_board.portals.values():
+        SCREEN.blit(portal_images_mini[portal_cell.subtype - 1], (start_pos[0] + portal_cell.pos.x * mini_size, start_pos[1] + portal_cell.pos.y * mini_size))
 
 
 def play_sound(sound):

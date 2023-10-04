@@ -39,7 +39,13 @@ snake_end = {
 
 # Map
 wall_image = pygame.image.load(Path(SOURCE, "images/textures/wall.bmp"))
-portal_image = pygame.image.load(Path(SOURCE, "images/textures/portal.bmp"))
+
+portal_images = {
+    1: pygame.image.load(Path(SOURCE, "images/textures/portal_1.bmp")),
+    2: pygame.image.load(Path(SOURCE, "images/textures/portal_2.bmp")),
+    3: pygame.image.load(Path(SOURCE, "images/textures/portal_3.bmp")),
+}
+
 sweet_image = pygame.image.load(Path(SOURCE, "images/textures/fruit.bmp"))
 
 # make black pixels transparent
@@ -49,7 +55,8 @@ for image in snake_head.values():
     image.set_colorkey("black")
 for image in snake_end.values():
     image.set_colorkey("black")
-portal_image.set_colorkey("black")
+for image in portal_images.values():
+    image.set_colorkey("black")
 sweet_image.set_colorkey("black")
 
 
