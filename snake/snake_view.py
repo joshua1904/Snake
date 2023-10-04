@@ -3,14 +3,9 @@ The front-end with pygame
 """
 from collections import deque
 
-import snake_classes
-import assets
+import snake.snake_classes as sc
+import snake.snake_assets as sa
 import pygame
-import utils
-
-CLOCK = pygame.time.Clock()
-SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-SCREEN_WIDTH, SCREEN_HEIGHT = SCREEN.get_size()
 
 
 def play_sound(sound):
@@ -31,21 +26,25 @@ class GameView:
         'ur': 'dl', 'ld': 'dl'
     }
 
-    def __init__(self, game: snake_classes.Game, map_str: str, cell_size=30):
+    def __init__(self, screen: pygame.Surface, clock: pygame.time.Clock,
+                 game: sc.Game, cell_size=30):
+        self.screen = screen
+        self.screen_width, self.screen_height = screen.get_size()
+        self.clock = clock
+
         self.game = game
-        self.map_str = map_str
         self.cell_size = cell_size
 
         self.map_width_px = self.game.board.dim.x * self.cell_size
         self.map_height_px = self.game.board.dim.y * self.cell_size
         self.map_surface: pygame.Surface        # the (immutable) background with walls and portals
 
-        self.background_image = assets.wall_image
+        self.background_image = sa.wall_image
         self._init_map_surface()
 
     def _init_map_surface(self):
         """Prepare the map_surface"""
-        self.map_surface = SCREEN.copy()
+        self.map_surface = self.screen.copy()
         self.map_surface.fill("black")
 
         # Background with border
@@ -60,11 +59,11 @@ class GameView:
 
         # Walls
         for wall in self.game.board.walls:
-            self.draw_to_board(assets.wall_image, wall.x, wall.y, self.map_surface)
+            self.draw_to_board(sa.wall_image, wall.x, wall.y, self.map_surface)
 
         # Portals
         for portal in self.game.board.portals:
-            self.draw_to_board(assets.portal_image, portal.x, portal.y, self.map_surface)
+            self.draw_to_board(sa.portal_image, portal.x, portal.y, self.map_surface)
 
     def _create_background(self, image: pygame.image, tile_size=(360, 360), darker=90) -> pygame.Surface:
         """
@@ -89,8 +88,8 @@ class GameView:
         :param y: y-Coord. on the board (in cells)
         :param surface: the surface to draw to
         """
-        surface.blit(image, (x * self.cell_size + SCREEN_WIDTH // 2 - self.map_width_px // 2,
-                             y * self.cell_size + SCREEN_HEIGHT // 2 - self.map_height_px // 2))
+        surface.blit(image, (x * self.cell_size + self.screen_width // 2 - self.map_width_px // 2,
+                             y * self.cell_size + self.screen_height // 2 - self.map_height_px // 2))
 
     def draw_snake(self):
         """
@@ -104,10 +103,10 @@ class GameView:
         end_dir = snake.directions[1]
 
         # Draw head
-        self.draw_to_board(assets.snake_head[head_dir], head_pos.x, head_pos.y, SCREEN)
+        self.draw_to_board(sa.snake_head[head_dir], head_pos.x, head_pos.y, self.screen)
 
         # Draw tail
-        self.draw_to_board(assets.snake_end[end_dir], end_pos.x, end_pos.y, SCREEN)
+        self.draw_to_board(sa.snake_end[end_dir], end_pos.x, end_pos.y, self.screen)
 
         # Draw middle parts
         for i, part_pos in enumerate(snake.positions):
@@ -115,21 +114,21 @@ class GameView:
                 part_dir = snake.directions[i]
                 part_next_dir = snake.directions[i + 1]
                 corner_id = GameView.MIDDLE_PARTS[part_dir + part_next_dir]
-                self.draw_to_board(assets.snake_part[corner_id], part_pos.x, part_pos.y, SCREEN)
+                self.draw_to_board(sa.snake_part[corner_id], part_pos.x, part_pos.y, self.screen)
 
     def draw_map(self):
         """Draw the background and map to the screen"""
-        SCREEN.blit(self.map_surface, (0, 0))
+        self.screen.blit(self.map_surface, (0, 0))
 
     def draw_sweet(self):
         """Draw the sweet on the screen"""
         sweet = self.game.sweet
-        self.draw_to_board(assets.sweet_image, sweet.pos.x, sweet.pos.y, SCREEN)
+        self.draw_to_board(sa.sweet_image, sweet.pos.x, sweet.pos.y, self.screen)
 
     def draw_score(self):
         """Draw the current score"""
-        text = assets.font.render(f"{self.game.score} HIGHSCORE: {self.game.highscore}", True, "blue")
-        SCREEN.blit(text, (30, 30))
+        text = sa.font.render(f"{self.game.score} HIGHSCORE: {self.game.highscore}", True, "blue")
+        self.screen.blit(text, (30, 30))
 
     def game_loop(self):
         """the main loop"""
@@ -187,53 +186,29 @@ class GameView:
                 self.draw_snake()
 
                 if move_event == "EATEN":
-                    play_sound(assets.eat_sound)
+                    play_sound(sa.eat_sound)
                     highscore_changed = self.game.inc_score()
                     if highscore_changed:
-                        play_sound(assets.beat_highscore_sound)
+                        play_sound(sa.beat_highscore_sound)
                     self.game.spawn_sweet()
 
                 elif move_event == "PORTAL":
-                    play_sound(assets.portal_sound)
+                    play_sound(sa.portal_sound)
 
                 self.draw_score()
                 pygame.display.flip()
 
             else:
-                play_sound(assets.damage_sound)
-                if self.game.highscore_changed:
-                    utils.set_highscore(self.map_str, self.game.highscore)
+                play_sound(sa.damage_sound)
                 return
 
             if speed:
                 if speed_count % 10 == 0:
-                    play_sound(assets.boost_sound)
-                CLOCK.tick(10)
+                    play_sound(sa.boost_sound)
+                self.clock.tick(10)
                 speed_count += 1
             else:
-                CLOCK.tick(5)  # limits FPS to 60
+                self.clock.tick(5)  # limits FPS to 60
                 speed_count = 0
 
-
-if __name__ == "__main__":
-
-    map_list = [[1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 1, 'r', 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 5, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1]]
-
-    game = snake_classes.Game(map_list, 12)
-
-    game_view = GameView(game, "map-name")
-
-    game_view.game_loop()
 

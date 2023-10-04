@@ -75,11 +75,11 @@ class Snake:
     DIRECTIONS = {'l': (-1, 0), 'u': (0, -1), 'r': (1, 0), 'd': (0, 1)}
     OPPOSITES = ['l', 'u', 'r', 'd']            # OPPOSITES[i-2] is opposite direction of OPPOSITES[i]
 
-    def __init__(self, board: GameBoard, start_pos: BoardPosition, start_direction: str):
+    def __init__(self, game: Game, start_pos: BoardPosition, start_direction: str):
         """
         Saves the snake in two double-ended-lists (deque), one for the positions and one for the directions
         """
-        self.board: GameBoard = board
+        self.game = game
         self.positions: Deque[BoardPosition] = deque([start_pos - Snake.DIRECTIONS[start_direction], start_pos])
         self.directions: Deque[str] = deque([start_direction, start_direction])
 
@@ -100,12 +100,12 @@ class Snake:
         new_position = last_position + Snake.DIRECTIONS[direction]
 
         # Check for crash
-        if new_position in self.positions or new_position in self.board.walls:
+        if new_position in self.positions or new_position in self.game.board.walls:
             return "CRASH"
 
         # Check for portals
-        elif new_position in self.board.portals:
-            start_portal = self.board.portals[new_position]
+        elif new_position in self.game.board.portals:
+            start_portal = self.game.board.portals[new_position]
             target_portal = start_portal.partner
             new_position = target_portal.pos + Snake.DIRECTIONS[direction]
             move_event = "PORTAL"
@@ -115,7 +115,7 @@ class Snake:
         self.directions.append(direction)
 
         # Check for sweet -> only pop tail if not eaten
-        if new_position == self.board.game.sweet.pos:
+        if new_position == self.game.sweet.pos:
             return "EATEN"
 
         self.positions.popleft()
@@ -131,9 +131,8 @@ class GameBoard:
     The current game-board
     """
 
-    def __init__(self, game: Game, map_list: List[List[Any]]):
+    def __init__(self, map_list: List[List[Any]]):
         """"""
-        self.game: Game = game
         dim_x, dim_y = len(map_list[0]), len(map_list)
         self.dim = XYTuple(dim_x, dim_y)
         self.walls: Dict[BoardPosition, BoardCell] = {}
@@ -148,7 +147,7 @@ class GameBoard:
         WALLS have id in range 1...3
         PORTALS have id >= 4, there have to be exactly two with the same id in map_list
         """
-        assert self.dim.x == len(map_list[0]) and self.dim.y == len(map_list), "Map-dimension doesn't match map_str"
+        assert self.dim.x == len(map_list[0]) and self.dim.y == len(map_list), "Map-dimension doesn't match map_list"
 
         portals_temp_dict: Dict[int, Optional[BoardCell]] = {}        # to find partner-portals
 
@@ -188,7 +187,7 @@ class Game:
 
     def __init__(self, map_list: List[List[Any]], highscore: int):
 
-        self.board = GameBoard(self, map_list)
+        self.board = GameBoard(map_list)
         self.snake: Snake
         self.sweet: BoardCell
 
@@ -196,15 +195,19 @@ class Game:
         self.highscore = highscore
         self.highscore_changed = False
 
-        self._init_snake(map_list)
+        found_snake = self._init_snake(map_list)
+        if not found_snake:
+            raise Exception("No snake starting-position ('l', 'r', 'u', 'd') in map_list!")
         self.spawn_sweet()
 
-    def _init_snake(self, map_list: List[List[Any]]):
+    def _init_snake(self, map_list: List[List[Any]]) -> bool:
         for row_counter, row in enumerate(map_list):
             for col_counter, cell_id in enumerate(row):
                 if cell_id in ('l', 'r', 'u', 'd'):
                     pos = BoardPosition(col_counter, row_counter, self.board)
-                    self.snake = Snake(self.board, pos, cell_id)
+                    self.snake = Snake(self, pos, cell_id)
+                    return True
+        return False
 
     def spawn_sweet(self):
         """

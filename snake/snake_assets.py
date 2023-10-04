@@ -3,7 +3,7 @@ from pathlib import Path
 
 pygame.init()
 
-SOURCE = Path("")
+SOURCE = Path("snake")
 
 # Font
 font = pygame.font.SysFont("comicsansms", 50)
@@ -12,7 +12,6 @@ font = pygame.font.SysFont("comicsansms", 50)
 eat_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/eat_sound.wav"))
 damage_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/damage.wav"))
 portal_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/portal.wav"))
-click_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/click.wav"))
 beat_highscore_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/beat_highscore.wav"))
 boost_sound = pygame.mixer.Sound(Path(SOURCE, "sounds/boost.wav"))
 
