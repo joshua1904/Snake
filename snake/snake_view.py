@@ -27,13 +27,14 @@ class GameView:
     }
 
     def __init__(self, screen: pygame.Surface, clock: pygame.time.Clock,
-                 game: sc.Game, cell_size=30):
+                 game: sc.Game, cell_size=30, base_speed=10):
         self.screen = screen
         self.screen_width, self.screen_height = screen.get_size()
         self.clock = clock
 
         self.game = game
         self.cell_size = cell_size
+        self.base_speed = base_speed
 
         self.map_width_px = self.game.board.dim.x * self.cell_size
         self.map_height_px = self.game.board.dim.y * self.cell_size
@@ -52,9 +53,7 @@ class GameView:
                                  self.map_height_px + (2 * self.cell_size)))
         border.fill("darkorchid4")
         self.draw_to_board(border, -1, -1, self.map_surface)
-        background_surface = self._create_background(self.background_image,
-                                                     (self.map_width_px,
-                                                      self.map_height_px))
+        background_surface = self._create_background(self.background_image)
         self.draw_to_board(background_surface, 0, 0, self.map_surface)
 
         # Walls
@@ -67,7 +66,7 @@ class GameView:
 
     def _create_background(self, image: pygame.image, tile_size=(360, 360), darker=90) -> pygame.Surface:
         """
-        Generate Background-Imgae
+        Generate Background-Image
         :param image: the image to use for the background
         :param tile_size: how big the image should be scaled in pixels
         :param darker: r, g, b values to be subtracted from image (0-255)
@@ -146,11 +145,10 @@ class GameView:
         running = True
 
         while running:
-            # poll for events
-            # pygame.QUIT event means the user clicked X to close your window
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    return
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
@@ -205,10 +203,10 @@ class GameView:
             if speed:
                 if speed_count % 10 == 0:
                     play_sound(sa.boost_sound)
-                self.clock.tick(10)
+                self.clock.tick(self.base_speed * 2)
                 speed_count += 1
             else:
-                self.clock.tick(5)  # limits FPS to 60
+                self.clock.tick(self.base_speed)  # limits FPS to 60
                 speed_count = 0
 
 

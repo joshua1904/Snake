@@ -13,7 +13,8 @@ MAP_FILE_ENDING = ".csv"
 
 def get_map(map_name):
     with open(Path(SOURCE, MAP_PATH + map_name + MAP_FILE_ENDING), "r") as f:
-        return list(csv.reader(f, delimiter=";"))
+        map_list = list(csv.reader(f, delimiter=";"))
+        return [row for row in map_list if row]         # remove empty rows (lines)
 
 
 def save_highscore(map_name, score):

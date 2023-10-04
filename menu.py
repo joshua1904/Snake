@@ -34,7 +34,7 @@ def play_sound(sound):
 
 
 def intro():
-    blink_count = 0
+    SCREEN.fill("black")
     highscore_map_1 = utils.get_highscore("map1")
     highscore_map_2 = utils.get_highscore("map3")
     text = menu_assets.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
@@ -45,9 +45,19 @@ def intro():
     map2_text_rect = map2_text.get_rect()
     map1_text_rect.center = (520, 780)
     map2_text_rect.center = (1400, 780)
+    draw_mini_map("map1", (200, 360))
+    draw_mini_map("map3", (1080, 360))
+    text = menu_assets.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
+    SCREEN.blit(text, text_rect)
+    SCREEN.blit(map1_text, map1_text_rect)
+    SCREEN.blit(map2_text, map2_text_rect)
+
     while intro:
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
+
             if keys[pygame.K_1]:
                 play_sound(menu_assets.click_sound)
                 return "map1"
@@ -56,21 +66,8 @@ def intro():
                 return "map3"
             if keys[pygame.K_DELETE]:
                 return
-        SCREEN.fill("black")
-        if blink_count < 10:
-            text = menu_assets.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
-        else:
-            text = menu_assets.font.render("PRESS 1 OR 2 TO START THE GAME", True, "red")
-        SCREEN.blit(text,
-                    text_rect)
-        draw_mini_map("map1", (200, 360))
-        draw_mini_map("map3", (1080, 360))
-        SCREEN.blit(map1_text, map1_text_rect)
-        SCREEN.blit(map2_text, map2_text_rect)
+
         pygame.display.update()
-        blink_count += 1
-        if blink_count == 20:
-            blink_count = 0
         CLOCK.tick(20)
 
 

@@ -147,14 +147,14 @@ class GameBoard:
         WALLS have id in range 1...3
         PORTALS have id >= 4, there have to be exactly two with the same id in map_list
         """
-        assert self.dim.x == len(map_list[0]) and self.dim.y == len(map_list), "Map-dimension doesn't match map_list"
-
+        # print(map_list)
         portals_temp_dict: Dict[int, Optional[BoardCell]] = {}        # to find partner-portals
 
         for row_counter, row in enumerate(map_list):
-            for col_counter, cell_id in enumerate(row):
+            for col_counter, col in enumerate(row):
 
-                if isinstance(cell_id, int):           # ignore non-digit cells (e.g. snake)
+                if col.isdigit():           # ignore non-digit cells (e.g. snake)
+                    cell_id = int(col)
 
                     # Walls
                     if cell_id in range(1, 4):
@@ -180,6 +180,9 @@ class GameBoard:
         # check that all portals have a partner
         assert all(v is None for v in portals_temp_dict.values()), (f"There are portals with no partner in "
                                                                     f"map_list: {map_list}")
+        # print(self.dim)
+        # print(self.walls)
+        # print(self.portals)
 
 
 class Game:
