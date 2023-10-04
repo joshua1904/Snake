@@ -18,13 +18,17 @@ def get_map(map_name):
         return [row for row in map_list if row]         # remove empty rows (lines)
 
 
-def save_highscore(map_name, score):
+def save_highscore(map_name, score, name, message):
     """
     Save highscore to json
     """
     highscore_json = get_json()
-    highscore_json[map_name] = score
-    print(highscore_json)
+    highscore_json[map_name] = {
+        "score": score,
+        "name": name,
+        "message": message
+    }
+    # print(highscore_json)
     with open(Path(SOURCE, "highscore.json").resolve(), "w") as f:
         json.dump(highscore_json, f)
 

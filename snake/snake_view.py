@@ -151,7 +151,9 @@ class GameView:
                     return
 
                 elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_SPACE:
+                    if event.key == pg.K_ESCAPE:
+                        running = False
+                    elif event.key == pg.K_SPACE:
                         speed = True
                     elif event.key == pg.K_LEFT:
                         pressed_direction_keys_queue.append('l')

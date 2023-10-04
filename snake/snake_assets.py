@@ -6,7 +6,8 @@ from settings import SOURCE
 pg.init()
 
 # Font
-font = pg.font.SysFont("comicsansms", 50)
+# font = pg.font.SysFont("comicsansms", 50)
+font = pg.font.Font(None, 64)
 
 # Sounds
 eat_sound = pg.mixer.Sound(Path(SOURCE, "snake", "sounds/eat_sound.wav").resolve())

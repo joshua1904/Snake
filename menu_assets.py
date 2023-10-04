@@ -7,7 +7,8 @@ pg.init()
 
 
 # Font
-font = pg.font.SysFont("comicsansms", 50)
+font = pg.font.Font(None, 64)
+font_small = pg.font.Font(None, 32)
 
 # Sounds
 click_sound = pg.mixer.Sound(Path(SOURCE, "sounds/click.wav").resolve())
