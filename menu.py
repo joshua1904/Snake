@@ -15,27 +15,27 @@ def play_sound(sound):
     pg.mixer.music.stop()
 
 
-def draw_mini_map(map_name, mini_size=20) -> pg.Surface:
+def draw_mini_map(map_name, mini_size=18) -> pg.Surface:
     """
     Draw a mini-map for the menu
     :param map_name: name of the map
     :param start_pos: where to place the mini-map on the screen
     :param mini_size: Size of a cell
     """
-    mini_map_surface = pg.Surface((64 * mini_size, 36 * mini_size))
-    mini_map_surface.fill("black")
-
     map_list = utils.get_map(map_name)
-
     game_board = sv.sc.GameBoard(map_list)
+
+    mini_map_surface = pg.Surface(((game_board.dim.x + 2) * mini_size, (game_board.dim.y + 2) * mini_size))
+    mini_map_surface.fill("darkorchid4")
+    mini_map_surface.fill("grey8", (mini_size, mini_size, game_board.dim.x * mini_size, game_board.dim.y * mini_size))
 
     wall_part_mini = pg.transform.scale(ma.wall_image, (mini_size, mini_size))
     portal_images_mini = [pg.transform.scale(image, (mini_size, mini_size)) for image in ma.portal_images.values()]
 
     for wall_pos in game_board.walls:
-        mini_map_surface.blit(wall_part_mini, (wall_pos.x * mini_size, wall_pos.y * mini_size))
+        mini_map_surface.blit(wall_part_mini, ((wall_pos.x + 1) * mini_size, (wall_pos.y + 1) * mini_size))
     for portal_cell in game_board.portals.values():
-        mini_map_surface.blit(portal_images_mini[portal_cell.subtype - 1], (portal_cell.pos.x * mini_size, portal_cell.pos.y * mini_size))
+        mini_map_surface.blit(portal_images_mini[portal_cell.subtype - 1], ((portal_cell.pos.x + 1) * mini_size, (portal_cell.pos.y + 1) * mini_size))
 
     return mini_map_surface
 
@@ -49,7 +49,7 @@ def intro():
         SCREEN.fill("black")
         highscore = utils.get_highscore(map_name)["score"]
         winner_map_1 = utils.get_highscore(map_name)["name"]
-        text = ma.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
+        text = ma.font.render("PRESS RETURN TO START THE GAME", True, "blue")
         text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, 100))
         map_text = ma.font.render(f"[{map_name}]  -  Highscore: {highscore}  -  Winner: {winner_map_1}", True, "white")
         map_text_rect = map_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
@@ -67,16 +67,16 @@ def intro():
             elif event.type == pg.KEYDOWN:
                 if event.key in (pg.K_ESCAPE, pg.K_DELETE):
                     return
-                elif event.key == pg.K_LEFT:
+
+                elif event.key in (pg.K_LEFT, pg.K_RIGHT):
+                    if event.key == pg.K_LEFT:
+                        selected_map_nr -= 1
+                    else:
+                        selected_map_nr += 1
                     play_sound(sa.eat_sound)
-                    selected_map_nr -= 1
                     selected_map_nr %= len(map_names)
-                    switch_map_to(map_names[selected_map_nr])
-                elif event.key == pg.K_RIGHT:
-                    play_sound(sa.eat_sound)
-                    selected_map_nr += 1
-                    selected_map_nr %= len(map_names)
-                    switch_map_to(map_names[selected_map_nr])
+                    selected_map_name = map_names[selected_map_nr]
+                    switch_map_to(selected_map_name)
                 elif event.key == pg.K_RETURN:
                     play_sound(ma.click_sound)
                     return selected_map_name

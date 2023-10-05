@@ -50,7 +50,7 @@ class GameView:
 
         # Background with border
         border = pg.Surface((self.map_width_px + (2 * self.cell_size),
-                                 self.map_height_px + (2 * self.cell_size)))
+                             self.map_height_px + (2 * self.cell_size)))
         border.fill("darkorchid4")
         self.draw_to_board(border, -1, -1, self.map_surface)
         background_surface = self._create_background(self.background_image)
