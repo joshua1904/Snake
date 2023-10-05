@@ -37,7 +37,7 @@ def get_highscore(map_name):
     data = get_json()
     if map_name in data.keys():
         return data[map_name]
-    return 0
+    return {"score": 0, "name": "Noob", "message": "Ich bin ein Noob."}
 
 
 def get_json():
