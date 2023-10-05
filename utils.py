@@ -110,3 +110,18 @@ class InputBox:
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 2)
+
+
+def create_map_from_image(image: pg.Surface):
+    """Image has to be a black and white bitmap, white pixels are walls, size of image is size of map"""
+    for y in range(0, image.get_height()):
+        for x in range(0, image.get_width()):
+            color = image.get_at((x, y))
+            if color.r >= 250:
+                print("1;", end="")
+            elif color.r <= 10:
+                print("0;", end="")
+        print("")
+
+i = pg.image.load(Path(SOURCE, "brainfuck.png"))
+create_map_from_image(i)
