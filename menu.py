@@ -1,5 +1,6 @@
 import pygame as pg
 import menu_assets as ma
+import snake.snake_assets as sa
 import utils
 import snake.snake_view as sv
 
@@ -9,70 +10,21 @@ SCREEN_WIDTH, SCREEN_HEIGHT = SCREEN.get_size()
 pg.mouse.set_visible(False)
 
 
-COLOR_INACTIVE = pg.Color('lightskyblue3')
-COLOR_ACTIVE = pg.Color('dodgerblue2')
+def play_sound(sound):
+    pg.mixer.Sound.play(sound)
+    pg.mixer.music.stop()
 
 
-class InputBox:
-
-    def __init__(self, x, y, w, h, text='', active=False, max_len=100):
-        self.rect = pg.Rect(x, y, w, h)
-        self.text = text
-        self.active = active
-        self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
-        self.txt_surface = ma.font_small.render(text, True, self.color)
-        self.max_len = max_len
-        self.bg_color = pg.Color(30, 30, 30)
-
-    def handle_event(self, event):
-        # if event.type == pg.MOUSEBUTTONDOWN:
-        #     # If the user clicked on the input_box rect.
-        #     if self.rect.collidepoint(event.pos):
-        #         # Toggle the active variable.
-        #         self.active = not self.active
-        #     else:
-        #         self.active = False
-        #     # Change the current color of the input box.
-
-        if event.type == pg.KEYDOWN:
-            if event.key in (pg.K_UP, pg.K_DOWN, pg.K_RETURN):
-                self.active = not self.active
-                self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
-
-            if self.active:
-                # if event.key == pg.K_RETURN:
-                #     print(self.text)
-                #     self.text = ''
-                if event.key == pg.K_BACKSPACE:
-                    self.text = self.text[:-1]
-                else:
-                    char = event.unicode
-                    if ((char.isascii() and char.isalnum()) or char in ' !?.,-()<>') and len(self.text) <= self.max_len:
-                        self.text += char
-
-            # Re-render the text.
-            self.txt_surface = ma.font_small.render(self.text, True, self.color)
-
-    def update(self):
-        # Resize the box if the text is too long.
-        width = max(200, self.txt_surface.get_width()+10)
-        self.rect.w = width
-
-    def draw(self, screen):
-        # Blit the text.
-        pg.draw.rect(screen, self.bg_color, self.rect)
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
-        # Blit the rect.
-        pg.draw.rect(screen, self.color, self.rect, 2)
-
-
-def draw_mini_map(map_name, start_pos, mini_size=10):
+def draw_mini_map(map_name, mini_size=20) -> pg.Surface:
     """
     Draw a mini-map for the menu
     :param map_name: name of the map
     :param start_pos: where to place the mini-map on the screen
     :param mini_size: Size of a cell
     """
+    mini_map_surface = pg.Surface((64 * mini_size, 36 * mini_size))
+    mini_map_surface.fill("black")
+
     map_list = utils.get_map(map_name)
 
     game_board = sv.sc.GameBoard(map_list)
@@ -81,124 +33,132 @@ def draw_mini_map(map_name, start_pos, mini_size=10):
     portal_images_mini = [pg.transform.scale(image, (mini_size, mini_size)) for image in ma.portal_images.values()]
 
     for wall_pos in game_board.walls:
-        SCREEN.blit(wall_part_mini, (start_pos[0] + wall_pos.x * mini_size, start_pos[1] + wall_pos.y * mini_size))
+        mini_map_surface.blit(wall_part_mini, (wall_pos.x * mini_size, wall_pos.y * mini_size))
     for portal_cell in game_board.portals.values():
-        SCREEN.blit(portal_images_mini[portal_cell.subtype - 1], (start_pos[0] + portal_cell.pos.x * mini_size, start_pos[1] + portal_cell.pos.y * mini_size))
+        mini_map_surface.blit(portal_images_mini[portal_cell.subtype - 1], (portal_cell.pos.x * mini_size, portal_cell.pos.y * mini_size))
 
-
-def play_sound(sound):
-    pg.mixer.Sound.play(sound)
-    pg.mixer.music.stop()
+    return mini_map_surface
 
 
 def intro():
-    SCREEN.fill("black")
-    highscore_map_1 = utils.get_highscore("map1")["score"]
-    highscore_map_2 = utils.get_highscore("map3")["score"]
-    winner_map_1 = utils.get_highscore("map1")["name"]
-    winner_map_2 = utils.get_highscore("map3")["name"]
-    text = ma.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
-    text_rect = text.get_rect(center=(1920 / 2, 100))
-    map1_text = ma.font.render(f"(1) Highscore: {highscore_map_1} ({winner_map_1})", True, "white")
-    map2_text = ma.font.render(f"(2) Highscore: {highscore_map_2} ({winner_map_2})", True, "white")
-    map1_text_rect = map1_text.get_rect()
-    map2_text_rect = map2_text.get_rect()
-    map1_text_rect.center = (520, 780)
-    map2_text_rect.center = (1400, 780)
-    draw_mini_map("map1", (200, 360))
-    draw_mini_map("map3", (1080, 360))
-    text = ma.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
-    SCREEN.blit(text, text_rect)
-    SCREEN.blit(map1_text, map1_text_rect)
-    SCREEN.blit(map2_text, map2_text_rect)
+    map_names = utils.get_all_map_names()
+    selected_map_nr = 0
+    selected_map_name = map_names[selected_map_nr]
+
+    def switch_map_to(map_name: str):
+        SCREEN.fill("black")
+        highscore = utils.get_highscore(map_name)["score"]
+        winner_map_1 = utils.get_highscore(map_name)["name"]
+        text = ma.font.render("PRESS 1 OR 2 TO START THE GAME", True, "blue")
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, 100))
+        map_text = ma.font.render(f"[{map_name}]  -  Highscore: {highscore}  -  Winner: {winner_map_1}", True, "white")
+        map_text_rect = map_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+        mini_map_surface = draw_mini_map(map_name)
+        SCREEN.blit(mini_map_surface, mini_map_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)))
+        SCREEN.blit(text, text_rect)
+        SCREEN.blit(map_text, map_text_rect)
+
+    switch_map_to(selected_map_name)
 
     while intro:
-        keys = pg.key.get_pressed()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+                if event.key in (pg.K_ESCAPE, pg.K_DELETE):
                     return
-
-            if keys[pg.K_1]:
-                play_sound(ma.click_sound)
-                return "map1"
-            if keys[pg.K_2]:
-                play_sound(ma.click_sound)
-                return "map3"
-            if keys[pg.K_DELETE]:
-                return
+                elif event.key == pg.K_LEFT:
+                    play_sound(sa.eat_sound)
+                    selected_map_nr -= 1
+                    selected_map_nr %= len(map_names)
+                    switch_map_to(map_names[selected_map_nr])
+                elif event.key == pg.K_RIGHT:
+                    play_sound(sa.eat_sound)
+                    selected_map_nr += 1
+                    selected_map_nr %= len(map_names)
+                    switch_map_to(map_names[selected_map_nr])
+                elif event.key == pg.K_RETURN:
+                    play_sound(ma.click_sound)
+                    return selected_map_name
 
         pg.display.update()
         CLOCK.tick(20)
+
+
+def new_highscore_dialog(map_name: str, game: sv.sc.Game):
+    """
+    Open dialog to enter name and message
+    """
+    old_winner = utils.get_highscore(map_name)["name"]
+    old_message = utils.get_highscore(map_name)["message"]
+
+    highscore_msg_popup = pg.Surface((1200, 700))
+    highscore_msg_popup.fill((30, 230, 30))
+    highscore_msg_popup.fill((30, 30, 30), (50, 50, 1100, 600))
+    highscore_msg_popup.blit(
+        ma.font_small.render(f"Du hast einen neuen Highscore von {game.highscore} für diese map erreicht!", True,
+                             "white"),
+        (100, 100))
+    highscore_msg_popup.blit(
+        ma.font_small.render(f"{old_winner} hat dir eine Nachricht hinterlassen:", True, "white"),
+        (100, 150))
+    highscore_msg_popup.blit(ma.font_small.render(f"\"{old_message}\"", True, "salmon"), (100, 225))
+    highscore_msg_popup.blit(ma.font_small.render("Dein Name:", True, "white"), (100, 300))
+    input_box1 = utils.InputBox(100, 350, 200, 32, active=True, max_len=12, text="Noob")
+
+    highscore_msg_popup.blit(ma.font_small.render("Deine Nachricht:", True, "white"), (100, 400))
+    input_box2 = utils.InputBox(100, 450, 1000, 32, max_len=64, text="Ich bin ein Noob")
+
+    highscore_msg_popup.blit(ma.font_small.render("- drücke die Strg/Ctrl Taste um fortzufahren -", True, "white"),
+                             (100, 550))
+
+    input_boxes = [input_box1, input_box2]
+    done = False
+
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    done = True
+                elif event.key in (pg.K_LCTRL, pg.K_RCTRL):
+                    done = True
+            for box in input_boxes:
+                box.handle_event(event)
+
+        # for box in input_boxes:
+        # box.update()
+
+        SCREEN.blit(highscore_msg_popup, (SCREEN_WIDTH // 2 - 600, SCREEN_HEIGHT // 2 - 400))
+        for box in input_boxes:
+            box.draw(highscore_msg_popup)
+
+        pg.display.flip()
+        CLOCK.tick(30)
+
+    name = input_box1.text
+    message = input_box2.text
+    utils.save_highscore(map_name, game.highscore, name, message)
 
 
 if __name__ == "__main__":
 
     while True:
 
-        map_name = intro()
-        if not map_name:
+        map_name1 = intro()
+        if not map_name1:
             break
 
-        map_list = utils.get_map(map_name)
-        map_highscore = utils.get_highscore(map_name)["score"]
-        game = sv.sc.Game(map_list, map_highscore)
-        game_view = sv.GameView(SCREEN, CLOCK, game)
-        game_view.game_loop()
+        map_list1 = utils.get_map(map_name1)
+        map_highscore1 = utils.get_highscore(map_name1)["score"]
+        game1 = sv.sc.Game(map_list1, map_highscore1)
+        game_view1 = sv.GameView(SCREEN, CLOCK, game1)
+        game_view1.game_loop()
 
-        if game.highscore_changed:
+        if game1.highscore_changed:
+            new_highscore_dialog(map_name1, game1)
 
-            old_winner = utils.get_highscore(map_name)["name"]
-            old_message = utils.get_highscore(map_name)["message"]
-
-            highscore_msg_popup = pg.Surface((1200, 700))
-            highscore_msg_popup.fill((30, 230, 30))
-            highscore_msg_popup.fill((30, 30, 30), (50, 50, 1100, 600))
-            highscore_msg_popup.blit(
-                ma.font_small.render(f"Du hast einen neuen Highscore von {game.highscore} für diese map erreicht!", True, "white"),
-                (100, 100))
-            highscore_msg_popup.blit(
-                ma.font_small.render(f"{old_winner} hat dir eine Nachricht hinterlassen:", True, "white"),
-                (100, 150))
-            highscore_msg_popup.blit(ma.font_small.render(f"\"{old_message}\"", True, "salmon"), (100, 225))
-            highscore_msg_popup.blit(ma.font_small.render("Dein Name:", True, "white"), (100, 300))
-            input_box1 = InputBox(100, 350, 200, 32, active=True, max_len=12, text="Noob")
-
-            highscore_msg_popup.blit(ma.font_small.render("Deine Nachricht:", True, "white"), (100, 400))
-            input_box2 = InputBox(100, 450, 1000, 32, max_len=64, text="Ich bin ein Noob")
-
-            highscore_msg_popup.blit(ma.font_small.render("- drücke die Strg/Ctrl Taste um fortzufahren -", True, "white"), (100, 550))
-
-            input_boxes = [input_box1, input_box2]
-            done = False
-
-            while not done:
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        done = True
-                    elif event.type == pg.KEYDOWN:
-                        if event.key == pg.K_ESCAPE:
-                            done = True
-                        elif event.key in (pg.K_LCTRL, pg.K_RCTRL):
-                            done = True
-                    for box in input_boxes:
-                        box.handle_event(event)
-
-                # for box in input_boxes:
-                    # box.update()
-
-                SCREEN.blit(highscore_msg_popup, (SCREEN_WIDTH // 2 - 600, SCREEN_HEIGHT // 2 - 400))
-                for box in input_boxes:
-                    box.draw(highscore_msg_popup)
-
-                pg.display.flip()
-                CLOCK.tick(30)
-
-            name = input_box1.text
-            message = input_box2.text
-            utils.save_highscore(map_name, game.highscore, name, message)
 
 
 
