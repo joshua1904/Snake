@@ -183,18 +183,21 @@ if __name__ == "__main__":
         map_highscore1 = utils.get_highscore(map_name1)["score"]
         game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1)
         game_view1 = sv.GameView(SCREEN, CLOCK, game1)
-        good_has_won = game_view1.game_loop()
+        winner = game_view1.game_loop()
 
         if not two_players1:
             if game1.highscore_changed:
                 new_highscore_dialog(map_name1, game1)
         else:
-            if good_has_won:
+            if winner == "GOOD":
                 play_sound(ma.victory_good_sound)
                 winner_dialog("GOOD HAS WON")
-            else:
+            elif winner == "EVIL":
                 play_sound(ma.victory_evil_sound)
                 winner_dialog("EVIL HAS WON")
+            elif winner == "DRAW":
+                play_sound(ma.bravo_sound)
+                winner_dialog("BOTH LOOSE!")
 
         CLOCK.tick(30)
 
