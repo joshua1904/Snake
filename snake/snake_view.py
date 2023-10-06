@@ -246,7 +246,10 @@ class GameView:
 
             else:
                 play_sound(sa.damage_sound)
-                return
+                if move_event == "CRASH":
+                    return "GOOD_HAS_WON"
+                else:
+                    return "EVIL_HAS_WON"
 
             if speed or speed_2:
                 if speed_count % 10 == 0:

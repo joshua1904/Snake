@@ -146,6 +146,30 @@ def new_highscore_dialog(map_name: str, game: sv.sc.Game):
     utils.save_highscore(map_name, game.highscore, name, message)
 
 
+def winner_dialog(winner: str):
+    """
+    Open dialog showing who as won
+    """
+
+    text = ma.font.render(f"{winner}", True, "red")
+    SCREEN.blit(text, text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)))
+
+    done = False
+
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    done = True
+                elif event.key == pg.K_RETURN:
+                    done = True
+
+        pg.display.flip()
+        CLOCK.tick(30)
+
+
 if __name__ == "__main__":
 
     while True:
@@ -158,10 +182,13 @@ if __name__ == "__main__":
         map_highscore1 = utils.get_highscore(map_name1)["score"]
         game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1)
         game_view1 = sv.GameView(SCREEN, CLOCK, game1)
-        game_view1.game_loop()
+        winner = game_view1.game_loop()
 
-        if game1.highscore_changed:
-            new_highscore_dialog(map_name1, game1)
+        if not two_players1:
+            if game1.highscore_changed:
+                new_highscore_dialog(map_name1, game1)
+        else:
+            winner_dialog(winner)
 
         CLOCK.tick(30)
 
