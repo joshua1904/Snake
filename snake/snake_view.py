@@ -90,12 +90,11 @@ class GameView:
         surface.blit(image, (x * self.cell_size + self.screen_width // 2 - self.map_width_px // 2,
                              y * self.cell_size + self.screen_height // 2 - self.map_height_px // 2))
 
-    def draw_snake(self):
+    def draw_snake(self, snake: sc.Snake):
         """
         Draw the snake
         end -> parts -> head
         """
-        snake = self.game.snake
         head_pos = snake.positions[-1]
         head_dir = snake.directions[-1]
         end_pos = snake.positions[0]
@@ -137,11 +136,20 @@ class GameView:
 
         # save pressed keys in queue
         pressed_direction_keys_queue = deque(list())
-
         speed = False
         speed_count = 0
         last_direction = self.game.snake.directions[-1]     
         wanted_direction = last_direction
+
+        # save pressed keys in queue Snake 2
+        pressed_direction_keys_queue_2 = None
+        last_direction_2 = None
+        wanted_direction_2 = None
+        if self.game.two_players:
+            pressed_direction_keys_queue_2 = deque(list())
+            last_direction_2 = self.game.snake_2.directions[-1]
+            wanted_direction_2 = last_direction_2
+
         running = True
 
         while running:
@@ -155,6 +163,7 @@ class GameView:
                         running = False
                     elif event.key == pg.K_SPACE:
                         speed = True
+
                     elif event.key == pg.K_LEFT:
                         pressed_direction_keys_queue.append('l')
                     elif event.key == pg.K_RIGHT:
@@ -163,6 +172,16 @@ class GameView:
                         pressed_direction_keys_queue.append('u')
                     elif event.key == pg.K_DOWN:
                         pressed_direction_keys_queue.append('d')
+
+                    if self.game.two_players:
+                        if event.key == pg.K_a:
+                            pressed_direction_keys_queue_2.append('l')
+                        elif event.key == pg.K_d:
+                            pressed_direction_keys_queue_2.append('r')
+                        elif event.key == pg.K_w:
+                            pressed_direction_keys_queue_2.append('u')
+                        elif event.key == pg.K_s:
+                            pressed_direction_keys_queue_2.append('d')
 
                 elif event.type == pg.KEYUP:
                     if event.key == pg.K_SPACE:
@@ -179,20 +198,35 @@ class GameView:
                         break
                 move_event = self.game.snake.move(wanted_direction)
 
-            if move_event != "CRASH":
+            move_event_2 = None
+            if self.game.two_players:
+                if not pressed_direction_keys_queue_2:
+                    last_direction_2 = self.game.snake_2.directions[-1]
+                    move_event_2 = self.game.snake_2.move(last_direction_2)
+                else:
+                    while pressed_direction_keys_queue_2:  # filter consecutive same directions like 'r', 'r', 'r'
+                        wanted_direction_2 = pressed_direction_keys_queue_2.popleft()
+                        if wanted_direction_2 != last_direction_2:
+                            last_direction_2 = wanted_direction_2
+                            break
+                    move_event_2 = self.game.snake_2.move(wanted_direction_2)
+
+            if not (move_event == "CRASH" or (self.game.two_players and move_event_2 == "CRASH")):
 
                 self.draw_map()
                 self.draw_sweet()
-                self.draw_snake()
+                self.draw_snake(self.game.snake)
+                if self.game.two_players:
+                    self.draw_snake(self.game.snake_2)
 
-                if move_event == "EATEN":
+                if move_event == "EATEN" or (self.game.two_players and move_event_2 == "EATEN"):
                     play_sound(sa.eat_sound)
                     highscore_changed = self.game.inc_score()
                     if highscore_changed:
                         play_sound(sa.beat_highscore_sound)
                     self.game.spawn_sweet()
 
-                elif move_event == "PORTAL":
+                elif move_event == "PORTAL" or (self.game.two_players and move_event_2 == "PORTAL"):
                     play_sound(sa.portal_sound)
 
                 self.draw_score()

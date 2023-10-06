@@ -100,7 +100,8 @@ class Snake:
         new_position = last_position + Snake.DIRECTIONS[direction]
 
         # Check for crash
-        if new_position in self.positions or new_position in self.game.board.walls:
+        if (new_position in self.positions or new_position in self.game.board.walls
+                or (self.game.two_players and new_position in self.game.snake_2.positions)):
             return "CRASH"
 
         # Check for portals
@@ -188,11 +189,14 @@ class GameBoard:
 class Game:
     """The game"""
 
-    def __init__(self, map_list: List[List[Any]], highscore: int):
+    def __init__(self, map_list: List[List[Any]], highscore: int, two_players=False):
 
         self.board = GameBoard(map_list)
-        self.snake: Snake
+        self.snake: Optional[Snake] = None
+        self.snake_2: Optional[Snake] = None
         self.sweet: BoardCell
+
+        self.two_players = two_players
 
         self.score = 0
         self.highscore = highscore
@@ -208,8 +212,13 @@ class Game:
             for col_counter, cell_id in enumerate(row):
                 if cell_id in ('l', 'r', 'u', 'd'):
                     pos = BoardPosition(col_counter, row_counter, self.board)
-                    self.snake = Snake(self, pos, cell_id)
-                    return True
+                    if not self.snake:
+                        self.snake = Snake(self, pos, cell_id)
+                        if not self.two_players:
+                            return True
+                    elif not self.snake_2 and self.two_players:
+                        self.snake_2 = Snake(self, pos, cell_id)
+                        return True
         return False
 
     def spawn_sweet(self):
@@ -223,8 +232,8 @@ class Game:
         if (sweet_pos not in self.board.walls.keys()
                 and sweet_pos not in self.board.portals.keys()
                 and sweet_pos not in self.snake.positions):
-
-            self.sweet = BoardCell(sweet_pos, "SWEET", 1)
+            if not self.two_players or (self.snake_2 and sweet_pos not in self.snake_2.positions):
+                self.sweet = BoardCell(sweet_pos, "SWEET", 1)
             return None
         else:
             return self.spawn_sweet()       # recursive
