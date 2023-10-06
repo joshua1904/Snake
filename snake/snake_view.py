@@ -156,12 +156,13 @@ class GameView:
         pressed_direction_keys_queue_2 = None
         speed_2 = False
         last_direction_2 = None
-        wanted_direction_2 = None
+        current_direction_2 = None
         move_event_2 = None
+        will_crash_2 = False
         if self.game.two_players:
             pressed_direction_keys_queue_2 = deque(list())
             last_direction_2 = self.game.snake_2.directions[-1]
-            wanted_direction_2 = last_direction_2
+            current_direction_2 = last_direction_2
             speed_key = pg.K_RCTRL
 
         even_step = True        # switch each iteration of game-loop between True and False -> used for speed
@@ -231,22 +232,23 @@ class GameView:
                         break
 
                 # check if crash in this direction
-                will_crash_2, next_pos_2 = self.game.snake_2.prepare_move(current_direction_2)
+                current_direction_2, next_pos_2, will_crash_2 = self.game.snake_2.prepare_move(current_direction_2)
 
                 # check if both snakes have same position in front of them
                 if next_pos == next_pos_2:
                     will_crash = will_crash_2 = True
 
-            # only move every second step, except if speed
-            if even_step or speed:
-                move_event = self.game.snake.move(current_direction)
+            # proceed only if no crash ahead
+            if not (will_crash or will_crash_2):
 
-            # Snake 2
-            if self.game.two_players:
-                if even_step or speed_2:
-                    move_event_2 = self.game.snake_2.move(current_direction_2)
+                # only move every second step, except if speed
+                if even_step or speed:
+                    move_event = self.game.snake.move(current_direction)
 
-            if not (move_event == "CRASH" or move_event_2 == "CRASH"):
+                # move Snake 2
+                if self.game.two_players:
+                    if even_step or speed_2:
+                        move_event_2 = self.game.snake_2.move(current_direction_2)
 
                 self.draw_map()
                 self.draw_sweet()
@@ -286,30 +288,18 @@ class GameView:
                     self.draw_two_player_score()
                 pg.display.flip()
 
+            # if crash ahead
             else:
                 play_sound(sa.damage_sound)
                 if not self.game.two_players:
                     return ""
                 else:
-                    if move_event == move_event_2 == "CRASH":
+                    if will_crash and will_crash_2:
                         return "DRAW"
-                    else:
-                        # if one crashed, check weather other would have crashed too after move of the first
-                        if move_event != "CRASH":
-                            crashed, _ = self.game.snake.prepare_move(last_direction)
-                            if crashed:
-                                move_event = "CRASH"
-                        elif move_event_2 != "CRASH":
-                            crashed_2, _ = self.game.snake_2.prepare_move(last_direction_2)
-                            if crashed_2:
-                                move_event_2 = "CRASH"
-
-                        if move_event == move_event_2 == "CRASH":
-                            return "DRAW"
-                        elif move_event == "CRASH":
-                            return "EVIL"
-                        elif move_event_2 == "CRASH":
-                            return "GOOD"
+                    elif will_crash:
+                        return "EVIL"
+                    elif will_crash_2:
+                        return "GOOD"
 
             if speed or speed_2:
                 if speed_count % 10 == 0:
