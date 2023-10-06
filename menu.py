@@ -229,7 +229,7 @@ if __name__ == "__main__":
         map_list1 = utils.get_map(map_name1)
         map_highscore1 = utils.get_highscore(map_name1)["score"]
         game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1, max_score=max_score1)
-        game_view1 = sv.GameView(SCREEN, CLOCK, game1)
+        game_view1 = sv.GameView(SCREEN, CLOCK, game1, base_speed=2)
         winner1 = game_view1.game_loop()
 
         if not two_players1:

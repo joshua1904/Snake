@@ -3,6 +3,7 @@ The back-end game logic
 """
 from __future__ import annotations
 
+import itertools
 import random
 from collections import namedtuple, deque
 from dataclasses import dataclass, field
@@ -88,7 +89,8 @@ class Snake:
         """
         1. correct direction if necessary (-> opposite direction to last not possible)
         2. find out next position for head
-        3. check if would crash on this next position
+        3. check if would crash on this next position,
+            BUT WITHOUT TAIL-ENDS! -> they might move!
         """
         # do not move in opposite direction
         last_direction = self.directions[-1]
@@ -99,11 +101,12 @@ class Snake:
         last_position = self.positions[-1]
         new_position = last_position + Snake.DIRECTIONS[direction]
 
-        crashed = (new_position in self.positions or
-                   new_position in self.game.board.walls or
-                   (self.game.two_players and
-                    (new_position in self.game.snake.positions or new_position in self.game.snake_2.positions)))
-        return direction, new_position, crashed
+        # itertools.islice(.., 1, None) removes first element of deque (tail-end!)
+        other_snake = self.game.snake if self.evil else self.game.snake_2
+        will_crash = (new_position in itertools.islice(self.positions, 1, None) or
+                      new_position in self.game.board.walls or
+                      (self.game.two_players and new_position in itertools.islice(other_snake.positions, 1, None)))
+        return direction, new_position, will_crash
 
     def move(self, direction: str) -> str:
         """
@@ -136,6 +139,23 @@ class Snake:
         # print(self.positions)
 
         return move_event
+
+    def check_if_crashed_tail_end(self) -> bool:
+        """
+        Check (after move()) if snake crashed into its own tail-end oder in other snakes tail-end
+        -> depends on if snake has eaten or not
+        """
+        head_pos = self.positions[-1]
+        tail_pos = self.positions[0]
+
+        crashed_tail = head_pos == tail_pos
+
+        if not crashed_tail and self.game.two_players:
+            other_snake = self.game.snake if self.evil else self.game.snake_2
+            other_tail_pos = other_snake.positions[0]
+            crashed_tail = head_pos == other_tail_pos
+
+        return crashed_tail
 
 
 class GameBoard:
