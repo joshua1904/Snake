@@ -137,19 +137,23 @@ class GameView:
         # save pressed keys in queue
         pressed_direction_keys_queue = deque(list())
         speed = False
-        speed_count = 0
         last_direction = self.game.snake.directions[-1]     
         wanted_direction = last_direction
+        move_event = None
 
-        # save pressed keys in queue Snake 2
+        # Snake 2
         pressed_direction_keys_queue_2 = None
+        speed_2 = False
         last_direction_2 = None
         wanted_direction_2 = None
+        move_event_2 = None
         if self.game.two_players:
             pressed_direction_keys_queue_2 = deque(list())
             last_direction_2 = self.game.snake_2.directions[-1]
             wanted_direction_2 = last_direction_2
 
+        even_step = True        # switch each iteration of game-loop between True and False -> used for speed
+        speed_count = 0
         running = True
 
         while running:
@@ -161,9 +165,9 @@ class GameView:
                 elif event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
                         running = False
+
                     elif event.key == pg.K_SPACE:
                         speed = True
-
                     elif event.key == pg.K_LEFT:
                         pressed_direction_keys_queue.append('l')
                     elif event.key == pg.K_RIGHT:
@@ -174,7 +178,9 @@ class GameView:
                         pressed_direction_keys_queue.append('d')
 
                     if self.game.two_players:
-                        if event.key == pg.K_a:
+                        if event.key == pg.K_LCTRL:
+                            speed_2 = True
+                        elif event.key == pg.K_a:
                             pressed_direction_keys_queue_2.append('l')
                         elif event.key == pg.K_d:
                             pressed_direction_keys_queue_2.append('r')
@@ -186,20 +192,23 @@ class GameView:
                 elif event.type == pg.KEYUP:
                     if event.key == pg.K_SPACE:
                         speed = False
+                    if self.game.two_players:
+                        if event.key == pg.K_LCTRL:
+                            speed_2 = False
 
-            if not pressed_direction_keys_queue:
-                last_direction = self.game.snake.directions[-1]         
-                move_event = self.game.snake.move(last_direction)
-            else:
-                while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
-                    wanted_direction = pressed_direction_keys_queue.popleft()
-                    if wanted_direction != last_direction:
-                        last_direction = wanted_direction
-                        break
-                move_event = self.game.snake.move(wanted_direction)
+            if even_step or speed:
+                if not pressed_direction_keys_queue:
+                    last_direction = self.game.snake.directions[-1]
+                    move_event = self.game.snake.move(last_direction)
+                else:
+                    while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
+                        wanted_direction = pressed_direction_keys_queue.popleft()
+                        if wanted_direction != last_direction:
+                            last_direction = wanted_direction
+                            break
+                    move_event = self.game.snake.move(wanted_direction)
 
-            move_event_2 = None
-            if self.game.two_players:
+            if self.game.two_players and (even_step or speed_2):
                 if not pressed_direction_keys_queue_2:
                     last_direction_2 = self.game.snake_2.directions[-1]
                     move_event_2 = self.game.snake_2.move(last_direction_2)
@@ -236,13 +245,15 @@ class GameView:
                 play_sound(sa.damage_sound)
                 return
 
-            if speed:
+            if speed or speed_2:
                 if speed_count % 10 == 0:
                     play_sound(sa.boost_sound)
-                self.clock.tick(self.base_speed * 2)
                 speed_count += 1
             else:
-                self.clock.tick(self.base_speed)  # limits FPS to 60
                 speed_count = 0
+
+            even_step = not even_step
+            self.clock.tick(self.base_speed * 2)  # limits FPS to 60
+
 
 
