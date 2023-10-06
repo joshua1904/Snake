@@ -49,7 +49,7 @@ def intro():
         SCREEN.fill("black")
         highscore = utils.get_highscore(map_name)["score"]
         winner_map_1 = utils.get_highscore(map_name)["name"]
-        text = ma.font.render("PRESS RETURN TO START THE GAME", True, "blue")
+        text = ma.font.render("PRESS 1 FOR SINGLE- OR 2 FOR TWO-PLAYER", True, "blue")
         text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, 100))
         map_text = ma.font.render(f"[{map_name}]  -  Highscore: {highscore}  -  Winner: {winner_map_1}", True, "white")
         map_text_rect = map_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
@@ -63,10 +63,10 @@ def intro():
     while intro:
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                return
+                return None, None
             elif event.type == pg.KEYDOWN:
                 if event.key in (pg.K_ESCAPE, pg.K_DELETE):
-                    return
+                    return None, None
 
                 elif event.key in (pg.K_LEFT, pg.K_RIGHT):
                     if event.key == pg.K_LEFT:
@@ -77,9 +77,13 @@ def intro():
                     selected_map_nr %= len(map_names)
                     selected_map_name = map_names[selected_map_nr]
                     switch_map_to(selected_map_name)
-                elif event.key == pg.K_RETURN:
+
+                elif event.key == pg.K_1:
                     play_sound(ma.click_sound)
-                    return selected_map_name
+                    return selected_map_name, False
+                elif event.key == pg.K_2:
+                    play_sound(ma.click_sound)
+                    return selected_map_name, True
 
         pg.display.update()
         CLOCK.tick(20)
@@ -146,19 +150,20 @@ if __name__ == "__main__":
 
     while True:
 
-        map_name1 = intro()
+        map_name1, two_players1 = intro()
         if not map_name1:
             break
 
         map_list1 = utils.get_map(map_name1)
         map_highscore1 = utils.get_highscore(map_name1)["score"]
-        game1 = sv.sc.Game(map_list1, map_highscore1, two_players=True)
+        game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1)
         game_view1 = sv.GameView(SCREEN, CLOCK, game1)
         game_view1.game_loop()
 
         if game1.highscore_changed:
             new_highscore_dialog(map_name1, game1)
 
+        CLOCK.tick(30)
 
 
 
