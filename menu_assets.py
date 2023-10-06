@@ -12,6 +12,8 @@ font_small = pg.font.Font(None, 32)
 
 # Sounds
 click_sound = pg.mixer.Sound(Path(SOURCE, "sounds/click.wav").resolve())
+victory_good_sound = pg.mixer.Sound(Path(SOURCE, "sounds/victory_good.wav").resolve())
+victory_evil_sound = pg.mixer.Sound(Path(SOURCE, "sounds/victory_evil.wav").resolve())
 
 # Mini-Map
 wall_image = pg.image.load(Path(SOURCE, "snake/images/textures/wall.bmp").resolve())
