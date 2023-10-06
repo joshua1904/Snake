@@ -150,6 +150,7 @@ class GameView:
         last_direction = self.game.snake.directions[-1]     
         wanted_direction = last_direction
         move_event = None
+        speed_key = pg.K_SPACE
 
         # Snake 2
         pressed_direction_keys_queue_2 = None
@@ -161,6 +162,7 @@ class GameView:
             pressed_direction_keys_queue_2 = deque(list())
             last_direction_2 = self.game.snake_2.directions[-1]
             wanted_direction_2 = last_direction_2
+            speed_key = pg.K_RCTRL
 
         even_step = True        # switch each iteration of game-loop between True and False -> used for speed
         speed_count = 0
@@ -176,7 +178,7 @@ class GameView:
                     if event.key == pg.K_ESCAPE:
                         running = False
 
-                    elif event.key == pg.K_SPACE:
+                    elif event.key == speed_key:
                         speed = True
                     elif event.key == pg.K_LEFT:
                         pressed_direction_keys_queue.append('l')
@@ -200,7 +202,7 @@ class GameView:
                             pressed_direction_keys_queue_2.append('d')
 
                 elif event.type == pg.KEYUP:
-                    if event.key == pg.K_SPACE:
+                    if event.key == speed_key:
                         speed = False
                     if self.game.two_players:
                         if event.key == pg.K_LCTRL:

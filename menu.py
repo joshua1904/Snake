@@ -1,8 +1,13 @@
+from pathlib import Path
+
 import pygame as pg
 import menu_assets as ma
+import settings
 import snake.snake_assets as sa
 import utils
 import snake.snake_view as sv
+
+PLATFORM = "DEV" if settings.SOURCE == Path("") else "PROD"
 
 CLOCK = pg.time.Clock()
 SCREEN = pg.display.set_mode((0, 0), pg.FULLSCREEN)
@@ -66,10 +71,11 @@ def intro():
             if event.type == pg.QUIT:
                 return None, None
             elif event.type == pg.KEYDOWN:
-                if event.key in (pg.K_ESCAPE, pg.K_DELETE):
-                    return None, None
+                if PLATFORM == "DEV":
+                    if event.key in (pg.K_ESCAPE, pg.K_DELETE):
+                        return None, None
 
-                elif event.key in (pg.K_LEFT, pg.K_RIGHT):
+                if event.key in (pg.K_LEFT, pg.K_RIGHT):
                     if event.key == pg.K_LEFT:
                         SELECTED_MAP_NR -= 1
                     else:
@@ -181,7 +187,7 @@ if __name__ == "__main__":
 
         map_list1 = utils.get_map(map_name1)
         map_highscore1 = utils.get_highscore(map_name1)["score"]
-        game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1, max_score=20)
+        game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1, max_score=10)
         game_view1 = sv.GameView(SCREEN, CLOCK, game1)
         winner = game_view1.game_loop()
 
@@ -198,8 +204,6 @@ if __name__ == "__main__":
             elif winner == "DRAW":
                 play_sound(ma.bravo_sound)
                 winner_dialog("BOTH LOOSE!")
-
-        CLOCK.tick(30)
 
 
 
