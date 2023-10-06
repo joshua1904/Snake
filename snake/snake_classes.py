@@ -102,7 +102,7 @@ class Snake:
 
         # Check for crash
         if (new_position in self.positions or new_position in self.game.board.walls
-                or (self.game.two_players and new_position in self.game.snake_2.positions)):
+                or (self.game.two_players and (new_position in self.game.snake.positions or new_position in self.game.snake_2.positions))):
             return "CRASH"
 
         # Check for portals

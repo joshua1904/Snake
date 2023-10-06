@@ -9,6 +9,8 @@ SCREEN = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 SCREEN_WIDTH, SCREEN_HEIGHT = SCREEN.get_size()
 pg.mouse.set_visible(False)
 
+SELECTED_MAP_NR = 0
+MAP_NAMES = utils.get_all_map_names()
 
 def play_sound(sound):
     pg.mixer.Sound.play(sound)
@@ -41,9 +43,8 @@ def draw_mini_map(map_name, mini_size=18) -> pg.Surface:
 
 
 def intro():
-    map_names = utils.get_all_map_names()
-    selected_map_nr = 0
-    selected_map_name = map_names[selected_map_nr]
+    global SELECTED_MAP_NR
+    selected_map_name = MAP_NAMES[SELECTED_MAP_NR]
 
     def switch_map_to(map_name: str):
         SCREEN.fill("black")
@@ -70,12 +71,12 @@ def intro():
 
                 elif event.key in (pg.K_LEFT, pg.K_RIGHT):
                     if event.key == pg.K_LEFT:
-                        selected_map_nr -= 1
+                        SELECTED_MAP_NR -= 1
                     else:
-                        selected_map_nr += 1
+                        SELECTED_MAP_NR += 1
                     play_sound(sa.eat_sound)
-                    selected_map_nr %= len(map_names)
-                    selected_map_name = map_names[selected_map_nr]
+                    SELECTED_MAP_NR %= len(MAP_NAMES)
+                    selected_map_name = MAP_NAMES[SELECTED_MAP_NR]
                     switch_map_to(selected_map_name)
 
                 elif event.key == pg.K_1:

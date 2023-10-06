@@ -258,6 +258,8 @@ class GameView:
             else:
                 speed_count = 0
 
+            move_event = ""
+            move_event_2 = ""
             even_step = not even_step
             self.clock.tick(self.base_speed * 2)  # limits FPS to 60
 
