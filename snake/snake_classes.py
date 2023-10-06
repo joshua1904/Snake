@@ -84,10 +84,18 @@ class Snake:
         self.positions: Deque[BoardPosition] = deque([start_pos - Snake.DIRECTIONS[start_direction], start_pos])
         self.directions: Deque[str] = deque([start_direction, start_direction])
 
-    def check_for_crash(self, direction: str) -> Tuple[bool, BoardPosition]:
+    def prepare_move(self, direction: str) -> Tuple[str, BoardPosition, bool]:
         """
-        Check if would crash in direction direction
+        1. correct direction if necessary (-> opposite direction to last not possible)
+        2. find out next position for head
+        3. check if would crash on this next position
         """
+        # do not move in opposite direction
+        last_direction = self.directions[-1]
+        i = Snake.OPPOSITES.index(last_direction)
+        if direction == Snake.OPPOSITES[i - 2]:
+            direction = last_direction
+
         last_position = self.positions[-1]
         new_position = last_position + Snake.DIRECTIONS[direction]
 
@@ -95,25 +103,17 @@ class Snake:
                    new_position in self.game.board.walls or
                    (self.game.two_players and
                     (new_position in self.game.snake.positions or new_position in self.game.snake_2.positions)))
-        return crashed, new_position
+        return direction, new_position, crashed
 
     def move(self, direction: str) -> str:
         """
         Saves a new snake-part to the snake in front (the head)
         and removes the last part (the tail)
         """
-        move_event = ""
+        move_event = "NOTHING"
 
-        # do not move in opposite direction
-        last_direction = self.directions[-1]
-        i = Snake.OPPOSITES.index(last_direction)
-        if direction == Snake.OPPOSITES[i - 2]:
-            direction = last_direction
-
-        # Check for crash
-        crashed, new_position = self.check_for_crash(direction)
-        if crashed:
-            return "CRASH"
+        # find out new position (no checks! -> are done in prepare_move())
+        new_position = self.positions[-1] + Snake.DIRECTIONS[direction]
 
         # Check for portals
         if new_position in self.game.board.portals:

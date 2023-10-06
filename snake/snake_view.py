@@ -148,7 +148,7 @@ class GameView:
         pressed_direction_keys_queue = deque(list())
         speed = False
         last_direction = self.game.snake.directions[-1]     
-        wanted_direction = last_direction
+        current_direction = last_direction
         move_event = None
         speed_key = pg.K_SPACE
 
@@ -208,29 +208,43 @@ class GameView:
                         if event.key == pg.K_LCTRL:
                             speed_2 = False
 
-            if even_step or speed:
-                if not pressed_direction_keys_queue:
-                    last_direction = self.game.snake.directions[-1]
-                    move_event = self.game.snake.move(last_direction)
-                else:
-                    while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
-                        wanted_direction = pressed_direction_keys_queue.popleft()
-                        if wanted_direction != last_direction:
-                            last_direction = wanted_direction
-                            break
-                    move_event = self.game.snake.move(wanted_direction)
+            # find out current direction for this step
+            # if pressed_direction_keys_queue is empty, old value of current_direction is used (from last step)
+            while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
+                current_direction = pressed_direction_keys_queue.popleft()
+                if current_direction != last_direction:
+                    last_direction = current_direction
+                    break
 
-            if self.game.two_players and (even_step or speed_2):
-                if not pressed_direction_keys_queue_2:
-                    last_direction_2 = self.game.snake_2.directions[-1]
-                    move_event_2 = self.game.snake_2.move(last_direction_2)
-                else:
-                    while pressed_direction_keys_queue_2:  # filter consecutive same directions like 'r', 'r', 'r'
-                        wanted_direction_2 = pressed_direction_keys_queue_2.popleft()
-                        if wanted_direction_2 != last_direction_2:
-                            last_direction_2 = wanted_direction_2
-                            break
-                    move_event_2 = self.game.snake_2.move(wanted_direction_2)
+            # check if crash in this direction
+            current_direction, next_pos, will_crash = self.game.snake.prepare_move(current_direction)
+
+            # Snake 2
+            if self.game.two_players:
+
+                # find out current direction for this step
+                # if pressed_direction_keys_queue is empty, old value of current_direction is used (from last step)
+                while pressed_direction_keys_queue_2:  # filter consecutive same directions like 'r', 'r', 'r'
+                    current_direction_2 = pressed_direction_keys_queue_2.popleft()
+                    if current_direction_2 != last_direction_2:
+                        last_direction_2 = current_direction_2
+                        break
+
+                # check if crash in this direction
+                will_crash_2, next_pos_2 = self.game.snake_2.prepare_move(current_direction_2)
+
+                # check if both snakes have same position in front of them
+                if next_pos == next_pos_2:
+                    will_crash = will_crash_2 = True
+
+            # only move every second step, except if speed
+            if even_step or speed:
+                move_event = self.game.snake.move(current_direction)
+
+            # Snake 2
+            if self.game.two_players:
+                if even_step or speed_2:
+                    move_event_2 = self.game.snake_2.move(current_direction_2)
 
             if not (move_event == "CRASH" or move_event_2 == "CRASH"):
 
@@ -282,11 +296,11 @@ class GameView:
                     else:
                         # if one crashed, check weather other would have crashed too after move of the first
                         if move_event != "CRASH":
-                            crashed, _ = self.game.snake.check_for_crash(last_direction)
+                            crashed, _ = self.game.snake.prepare_move(last_direction)
                             if crashed:
                                 move_event = "CRASH"
                         elif move_event_2 != "CRASH":
-                            crashed_2, _ = self.game.snake_2.check_for_crash(last_direction_2)
+                            crashed_2, _ = self.game.snake_2.prepare_move(last_direction_2)
                             if crashed_2:
                                 move_event_2 = "CRASH"
 
