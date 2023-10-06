@@ -123,5 +123,7 @@ def create_map_from_image(image: pg.Surface):
                 print("0;", end="")
         print("")
 
-i = pg.image.load(Path(SOURCE, "brainfuck.png"))
-create_map_from_image(i)
+
+# i = pg.image.load(Path(SOURCE, "brainfuck.png"))
+# create_map_from_image(i)
+
