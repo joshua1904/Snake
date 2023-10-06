@@ -61,14 +61,18 @@ class InputBox:
     COLOR_INACTIVE = pg.Color('lightskyblue3')
     COLOR_ACTIVE = pg.Color('dodgerblue2')
 
-    def __init__(self, x, y, w, h, text='', active=False, max_len=100):
+    def __init__(self, x, y, w, h, text='', active=False, always_active=False, max_len=100, only_digits=False):
         self.rect = pg.Rect(x, y, w, h)
         self.text = text
         self.active = active
+        self.always_active = always_active
+        if self.always_active:
+            self.active = True
         self.color = InputBox.COLOR_ACTIVE if self.active else InputBox.COLOR_INACTIVE
         self.txt_surface = ma.font_small.render(text, True, self.color)
         self.max_len = max_len
         self.bg_color = pg.Color(30, 30, 30)
+        self.only_digits = only_digits
 
     def handle_event(self, event):
         # if event.type == pg.MOUSEBUTTONDOWN:
@@ -81,9 +85,10 @@ class InputBox:
         #     # Change the current color of the input box.
 
         if event.type == pg.KEYDOWN:
-            if event.key in (pg.K_UP, pg.K_DOWN, pg.K_RETURN):
-                self.active = not self.active
-                self.color = InputBox.COLOR_ACTIVE if self.active else InputBox.COLOR_INACTIVE
+            if not self.always_active:
+                if event.key in (pg.K_UP, pg.K_DOWN, pg.K_RETURN):
+                    self.active = not self.active
+                    self.color = InputBox.COLOR_ACTIVE if self.active else InputBox.COLOR_INACTIVE
 
             if self.active:
                 # if event.key == pg.K_RETURN:
@@ -94,7 +99,8 @@ class InputBox:
                 else:
                     char = event.unicode
                     if ((char.isascii() and char.isalnum()) or char in ' !?.,-()<>') and len(self.text) <= self.max_len:
-                        self.text += char
+                        if not self.only_digits or char.isdigit():
+                            self.text += char
 
             # Re-render the text.
             self.txt_surface = ma.font_small.render(self.text, True, self.color)

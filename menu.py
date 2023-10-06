@@ -17,6 +17,7 @@ pg.mouse.set_visible(False)
 SELECTED_MAP_NR = 0
 MAP_NAMES = utils.get_all_map_names()
 
+
 def play_sound(sound):
     pg.mixer.Sound.play(sound)
     pg.mixer.music.stop()
@@ -26,7 +27,6 @@ def draw_mini_map(map_name, mini_size=18) -> pg.Surface:
     """
     Draw a mini-map for the menu
     :param map_name: name of the map
-    :param start_pos: where to place the mini-map on the screen
     :param mini_size: Size of a cell
     """
     map_list = utils.get_map(map_name)
@@ -177,6 +177,41 @@ def winner_dialog(winner: str):
         CLOCK.tick(30)
 
 
+def max_score_dialog() -> int:
+    """
+    Enter max score dialog
+    """
+    popup = pg.Surface((100, 100))
+    popup.fill((30, 230, 30))
+    popup.fill((30, 30, 30), (10, 10, 80, 80))
+    popup.blit(ma.font_small.render("bis: ", True, "white"), (20, 20))
+
+    input_box = utils.InputBox(20, 50, 60, 32, always_active=True, max_len=1, text="10", only_digits=True)
+
+    done = False
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    done = True
+            input_box.handle_event(event)
+
+        SCREEN.blit(popup, popup.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)))
+        input_box.draw(popup)
+
+        pg.display.flip()
+        CLOCK.tick(30)
+
+    if input_box.text.isdigit() and len(input_box.text) > 0:
+        max_score = max(1, int(input_box.text))
+    else:
+        max_score = 1
+
+    return max_score
+
+
 if __name__ == "__main__":
 
     while True:
@@ -185,23 +220,29 @@ if __name__ == "__main__":
         if not map_name1:
             break
 
+        if two_players1:
+            max_score1 = max_score_dialog()
+            play_sound(ma.click_sound)
+        else:
+            max_score1 = 0
+
         map_list1 = utils.get_map(map_name1)
         map_highscore1 = utils.get_highscore(map_name1)["score"]
-        game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1, max_score=10)
+        game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1, max_score=max_score1)
         game_view1 = sv.GameView(SCREEN, CLOCK, game1)
-        winner = game_view1.game_loop()
+        winner1 = game_view1.game_loop()
 
         if not two_players1:
             if game1.highscore_changed:
                 new_highscore_dialog(map_name1, game1)
         else:
-            if winner == "GOOD":
+            if winner1 == "GOOD":
                 play_sound(ma.victory_good_sound)
                 winner_dialog("GOOD HAS WON")
-            elif winner == "EVIL":
+            elif winner1 == "EVIL":
                 play_sound(ma.victory_evil_sound)
                 winner_dialog("EVIL HAS WON")
-            elif winner == "DRAW":
+            elif winner1 == "DRAW":
                 play_sound(ma.bravo_sound)
                 winner_dialog("BOTH LOOSE!")
 
