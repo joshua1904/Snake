@@ -38,6 +38,28 @@ snake_end = {
     'l': pg.image.load(Path(SOURCE, "snake", "images/textures/end_l.bmp").resolve())
 }
 
+# Snake 2
+snake_part_2 = {
+    'rl': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/part_rl.bmp").resolve()),
+    'ud': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/part_ud.bmp").resolve()),
+    'dr': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/corner_dr.bmp").resolve()),
+    'dl': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/corner_dl.bmp").resolve()),
+    'ur': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/corner_ur.bmp").resolve()),
+    'ul': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/corner_ul.bmp").resolve())
+}
+snake_head_2 = {
+    'r': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/head_l.bmp").resolve()),
+    'u': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/head_u.bmp").resolve()),
+    'd': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/head_d.bmp").resolve()),
+    'l': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/head_r.bmp").resolve())
+}
+snake_end_2 = {
+    'r': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/end_r.bmp").resolve()),
+    'u': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/end_u.bmp").resolve()),
+    'd': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/end_d.bmp").resolve()),
+    'l': pg.image.load(Path(SOURCE, "snake", "images/textures/evil/end_l.bmp").resolve())
+}
+
 # Map
 wall_image = pg.image.load(Path(SOURCE, "snake", "images/textures/wall.bmp").resolve())
 
@@ -55,6 +77,12 @@ for image in snake_part.values():
 for image in snake_head.values():
     image.set_colorkey("black")
 for image in snake_end.values():
+    image.set_colorkey("black")
+for image in snake_part_2.values():
+    image.set_colorkey("black")
+for image in snake_head_2.values():
+    image.set_colorkey("black")
+for image in snake_end_2.values():
     image.set_colorkey("black")
 for image in portal_images.values():
     image.set_colorkey("black")

@@ -75,11 +75,12 @@ class Snake:
     DIRECTIONS = {'l': (-1, 0), 'u': (0, -1), 'r': (1, 0), 'd': (0, 1)}
     OPPOSITES = ['l', 'u', 'r', 'd']            # OPPOSITES[i-2] is opposite direction of OPPOSITES[i]
 
-    def __init__(self, game: Game, start_pos: BoardPosition, start_direction: str):
+    def __init__(self, game: Game, start_pos: BoardPosition, start_direction: str, evil=False):
         """
         Saves the snake in two double-ended-lists (deque), one for the positions and one for the directions
         """
         self.game = game
+        self.evil = evil
         self.positions: Deque[BoardPosition] = deque([start_pos - Snake.DIRECTIONS[start_direction], start_pos])
         self.directions: Deque[str] = deque([start_direction, start_direction])
 
@@ -217,7 +218,7 @@ class Game:
                         if not self.two_players:
                             return True
                     elif not self.snake_2 and self.two_players:
-                        self.snake_2 = Snake(self, pos, cell_id)
+                        self.snake_2 = Snake(self, pos, cell_id, evil=True)
                         return True
         return False
 

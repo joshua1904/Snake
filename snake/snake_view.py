@@ -101,18 +101,21 @@ class GameView:
         end_dir = snake.directions[1]
 
         # Draw head
-        self.draw_to_board(sa.snake_head[head_dir], head_pos.x, head_pos.y, self.screen)
+        img = sa.snake_head[head_dir] if not snake.evil else sa.snake_head_2[head_dir]
+        self.draw_to_board(img, head_pos.x, head_pos.y, self.screen)
 
         # Draw tail
-        self.draw_to_board(sa.snake_end[end_dir], end_pos.x, end_pos.y, self.screen)
+        img = sa.snake_end[end_dir] if not snake.evil else sa.snake_end_2[end_dir]
+        self.draw_to_board(img, end_pos.x, end_pos.y, self.screen)
 
         # Draw middle parts
+        img_list = sa.snake_part if not snake.evil else sa.snake_part_2
         for i, part_pos in enumerate(snake.positions):
             if i in range(1, len(snake.positions) - 1):
                 part_dir = snake.directions[i]
                 part_next_dir = snake.directions[i + 1]
                 corner_id = GameView.MIDDLE_PARTS[part_dir + part_next_dir]
-                self.draw_to_board(sa.snake_part[corner_id], part_pos.x, part_pos.y, self.screen)
+                self.draw_to_board(img_list[corner_id], part_pos.x, part_pos.y, self.screen)
 
     def draw_map(self):
         """Draw the background and map to the screen"""
