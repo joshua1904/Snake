@@ -84,6 +84,19 @@ class Snake:
         self.positions: Deque[BoardPosition] = deque([start_pos - Snake.DIRECTIONS[start_direction], start_pos])
         self.directions: Deque[str] = deque([start_direction, start_direction])
 
+    def check_for_crash(self, direction: str) -> Tuple[bool, BoardPosition]:
+        """
+        Check if would crash in direction direction
+        """
+        last_position = self.positions[-1]
+        new_position = last_position + Snake.DIRECTIONS[direction]
+
+        crashed = (new_position in self.positions or
+                   new_position in self.game.board.walls or
+                   (self.game.two_players and
+                    (new_position in self.game.snake.positions or new_position in self.game.snake_2.positions)))
+        return crashed, new_position
+
     def move(self, direction: str) -> str:
         """
         Saves a new snake-part to the snake in front (the head)
@@ -97,16 +110,13 @@ class Snake:
         if direction == Snake.OPPOSITES[i - 2]:
             direction = last_direction
 
-        last_position = self.positions[-1]
-        new_position = last_position + Snake.DIRECTIONS[direction]
-
         # Check for crash
-        if (new_position in self.positions or new_position in self.game.board.walls
-                or (self.game.two_players and (new_position in self.game.snake.positions or new_position in self.game.snake_2.positions))):
+        crashed, new_position = self.check_for_crash(direction)
+        if crashed:
             return "CRASH"
 
         # Check for portals
-        elif new_position in self.game.board.portals:
+        if new_position in self.game.board.portals:
             start_portal = self.game.board.portals[new_position]
             target_portal = start_portal.partner
             new_position = target_portal.pos + Snake.DIRECTIONS[direction]
@@ -238,7 +248,7 @@ class Game:
                 and sweet_pos not in self.snake.positions):
             if not self.two_players or (self.snake_2 and sweet_pos not in self.snake_2.positions):
                 self.sweet = BoardCell(sweet_pos, "SWEET", 1)
-            return None
+                return None
         else:
             return self.spawn_sweet()       # recursive
 

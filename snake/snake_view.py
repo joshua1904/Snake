@@ -232,7 +232,7 @@ class GameView:
                             break
                     move_event_2 = self.game.snake_2.move(wanted_direction_2)
 
-            if not (move_event == "CRASH" or (self.game.two_players and move_event_2 == "CRASH")):
+            if not (move_event == "CRASH" or move_event_2 == "CRASH"):
 
                 self.draw_map()
                 self.draw_sweet()
@@ -274,13 +274,28 @@ class GameView:
 
             else:
                 play_sound(sa.damage_sound)
-                if move_event == move_event_2 == "CRASH":
-                    return "DRAW"
+                if not self.game.two_players:
+                    return ""
                 else:
-                    if move_event == "CRASH":
-                        return "EVIL"
+                    if move_event == move_event_2 == "CRASH":
+                        return "DRAW"
                     else:
-                        return "GOOD"
+                        # if one crashed, check weather other would have crashed too after move of the first
+                        if move_event != "CRASH":
+                            crashed, _ = self.game.snake.check_for_crash(last_direction)
+                            if crashed:
+                                move_event = "CRASH"
+                        elif move_event_2 != "CRASH":
+                            crashed_2, _ = self.game.snake_2.check_for_crash(last_direction_2)
+                            if crashed_2:
+                                move_event_2 = "CRASH"
+
+                        if move_event == move_event_2 == "CRASH":
+                            return "DRAW"
+                        elif move_event == "CRASH":
+                            return "EVIL"
+                        elif move_event_2 == "CRASH":
+                            return "GOOD"
 
             if speed or speed_2:
                 if speed_count % 10 == 0:
