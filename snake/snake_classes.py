@@ -190,18 +190,21 @@ class GameBoard:
 class Game:
     """The game"""
 
-    def __init__(self, map_list: List[List[Any]], highscore: int, two_players=False):
+    def __init__(self, map_list: List[List[Any]], highscore: int, two_players=False, max_score=20):
 
         self.board = GameBoard(map_list)
         self.snake: Optional[Snake] = None
         self.snake_2: Optional[Snake] = None
         self.sweet: BoardCell
 
-        self.two_players = two_players
-
         self.score = 0
         self.highscore = highscore
         self.highscore_changed = False
+
+        self.two_players = two_players
+        self.max_score = max_score
+        self.score_good = 0
+        self.score_evil = 0
 
         found_snake = self._init_snake(map_list)
         if not found_snake:

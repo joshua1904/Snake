@@ -131,6 +131,13 @@ class GameView:
         text = sa.font.render(f"{self.game.score} HIGHSCORE: {self.game.highscore}", True, "blue")
         self.screen.blit(text, (30, 30))
 
+    def draw_two_player_score(self):
+        """Draw the current score: two player"""
+        text_good = sa.font.render(f"GOOD:  {self.game.score_good}  /  {self.game.max_score}", True, "chartreuse3")
+        text_evil = sa.font.render(f"EVIL:  {self.game.score_evil}  /  {self.game.max_score}", True, "magenta3")
+        self.screen.blit(text_good, (60, 30))
+        self.screen.blit(text_evil, (self.screen_width - text_evil.get_width() - 60, 30))
+
     def game_loop(self):
         """the main loop"""
 
@@ -231,17 +238,36 @@ class GameView:
                 if self.game.two_players:
                     self.draw_snake(self.game.snake_2)
 
-                if move_event == "EATEN" or (self.game.two_players and move_event_2 == "EATEN"):
-                    play_sound(sa.eat_sound)
-                    highscore_changed = self.game.inc_score()
-                    if highscore_changed:
-                        play_sound(sa.beat_highscore_sound)
-                    self.game.spawn_sweet()
+                if not self.game.two_players:
+                    if move_event == "EATEN":
+                        play_sound(sa.eat_sound)
+                        highscore_changed = self.game.inc_score()
+                        if highscore_changed:
+                            play_sound(sa.beat_highscore_sound)
+                        self.game.spawn_sweet()
+                else:
+                    if move_event == "EATEN":
+                        play_sound(sa.eat_sound)
+                        self.game.score_good += 1
+                        self.draw_two_player_score()
+                        if self.game.score_good == self.game.max_score:
+                            return "GOOD"
+                        self.game.spawn_sweet()
+                    elif move_event_2 == "EATEN":
+                        play_sound(sa.eat_sound)
+                        self.game.score_evil += 1
+                        self.draw_two_player_score()
+                        if self.game.score_evil == self.game.max_score:
+                            return "EVIL"
+                        self.game.spawn_sweet()
 
-                elif move_event == "PORTAL" or (self.game.two_players and move_event_2 == "PORTAL"):
+                if move_event == "PORTAL" or (self.game.two_players and move_event_2 == "PORTAL"):
                     play_sound(sa.portal_sound)
 
-                self.draw_score()
+                if not self.game.two_players:
+                    self.draw_score()
+                else:
+                    self.draw_two_player_score()
                 pg.display.flip()
 
             else:
