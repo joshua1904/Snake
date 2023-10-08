@@ -168,6 +168,7 @@ class GameView:
 
         even_step = True        # switch each iteration of game-loop between True and False -> used for speed
         speed_count = 0
+        speed_count_2 = 0
         running = True
 
         while running:
@@ -283,15 +284,17 @@ class GameView:
                             return "GOOD"
                         self.game.spawn_sweet()
                     elif move_event_2 == "EATEN":
-                        play_sound(sa.eat_sound)
+                        play_sound(sa.eat_sound_2)
                         self.game.score_evil += 1
                         self.draw_two_player_score()
                         if self.game.score_evil == self.game.max_score:
                             return "EVIL"
                         self.game.spawn_sweet()
 
-                if move_event == "PORTAL" or (self.game.two_players and move_event_2 == "PORTAL"):
+                if move_event == "PORTAL":
                     play_sound(sa.portal_sound)
+                if move_event_2 == "PORTAL":
+                    play_sound(sa.portal_sound_2)
 
                 if not self.game.two_players:
                     self.draw_score()
@@ -301,23 +304,34 @@ class GameView:
 
             # if crash ahead
             else:
-                play_sound(sa.damage_sound)
                 if not self.game.two_players:
+                    play_sound(sa.damage_sound)
                     return ""
                 else:
                     if will_crash and will_crash_2:
+                        play_sound(sa.damage_sound)
+                        play_sound(sa.damage_sound_2)
                         return "DRAW"
                     elif will_crash:
+                        play_sound(sa.damage_sound)
                         return "EVIL"
                     elif will_crash_2:
+                        play_sound(sa.damage_sound_2)
                         return "GOOD"
 
-            if speed or speed_2:
+            if speed:
                 if speed_count % 10 == 0:
                     play_sound(sa.boost_sound)
                 speed_count += 1
             else:
                 speed_count = 0
+
+            if speed_2:
+                if speed_count_2 % 10 == 0:
+                    play_sound(sa.boost_sound_2)
+                speed_count_2 += 1
+            else:
+                speed_count_2 = 0
 
             move_event = ""
             move_event_2 = ""

@@ -10,11 +10,19 @@ pg.init()
 font = pg.font.Font(None, 64)
 
 # Sounds
+beat_highscore_sound = pg.mixer.Sound(Path(SOURCE, "snake",  "sounds/beat_highscore.wav").resolve())
+
+# Sounds Snake 1
 eat_sound = pg.mixer.Sound(Path(SOURCE, "snake", "sounds/eat_sound.wav").resolve())
 damage_sound = pg.mixer.Sound(Path(SOURCE, "snake",  "sounds/damage.wav").resolve())
 portal_sound = pg.mixer.Sound(Path(SOURCE, "snake",  "sounds/portal.wav").resolve())
-beat_highscore_sound = pg.mixer.Sound(Path(SOURCE, "snake",  "sounds/beat_highscore.wav").resolve())
 boost_sound = pg.mixer.Sound(Path(SOURCE, "snake", "sounds/boost.wav").resolve())
+
+# Sounds Snake 2
+eat_sound_2 = pg.mixer.Sound(Path(SOURCE, "snake", "sounds/eat_sound_evil.wav").resolve())
+damage_sound_2 = pg.mixer.Sound(Path(SOURCE, "snake",  "sounds/damage_evil.wav").resolve())
+portal_sound_2 = pg.mixer.Sound(Path(SOURCE, "snake",  "sounds/portal_evil.wav").resolve())
+boost_sound_2 = pg.mixer.Sound(Path(SOURCE, "snake", "sounds/boost_evil.wav").resolve())
 
 # Snake
 snake_part = {
