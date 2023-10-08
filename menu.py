@@ -55,7 +55,7 @@ def intro():
         SCREEN.fill("black")
         highscore = utils.get_highscore(map_name)["score"]
         winner_map_1 = utils.get_highscore(map_name)["name"]
-        text = ma.font.render("PRESS 1 FOR SINGLE- OR 2 FOR TWO-PLAYER", True, "blue")
+        text = ma.font.render("DRÜCKE 1 FÜR EIN-SPIELER- ODER 2 FÜR ZWEI-SPIELER-MODUS", True, "blue")
         text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, 100))
         map_text = ma.font.render(f"[{map_name}]  -  Highscore: {highscore}  -  Winner: {winner_map_1}", True, "white")
         map_text_rect = map_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
@@ -238,13 +238,13 @@ if __name__ == "__main__":
         else:
             if winner1 == "GOOD":
                 play_sound(ma.victory_good_sound)
-                winner_dialog("GOOD HAS WON")
+                winner_dialog("GRÜN GEWINNT")
             elif winner1 == "EVIL":
                 play_sound(ma.victory_evil_sound)
-                winner_dialog("EVIL HAS WON")
+                winner_dialog("LILA GEWINNT")
             elif winner1 == "DRAW":
                 play_sound(ma.bravo_sound)
-                winner_dialog("BOTH LOOSE!")
+                winner_dialog("BEIDE VERLIEREN")
 
 
 
