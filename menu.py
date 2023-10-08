@@ -192,9 +192,11 @@ def max_score_dialog() -> int:
     while not done:
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                done = True
+                return -1
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_ESCAPE:
+                    return -1
+                elif event.key == pg.K_RETURN:
                     done = True
             input_box.handle_event(event)
 
@@ -203,6 +205,8 @@ def max_score_dialog() -> int:
 
         pg.display.flip()
         CLOCK.tick(30)
+
+    play_sound(ma.click_sound)
 
     if input_box.text.isdigit() and len(input_box.text) > 0:
         max_score = max(1, int(input_box.text))
@@ -222,14 +226,19 @@ if __name__ == "__main__":
 
         if two_players1:
             max_score1 = max_score_dialog()
-            play_sound(ma.click_sound)
+            start_speed1 = 8
+            inc_speed = False
+            if max_score1 == -1:
+                continue
         else:
             max_score1 = 0
+            start_speed1 = 4
+            inc_speed = True
 
         map_list1 = utils.get_map(map_name1)
         map_highscore1 = utils.get_highscore(map_name1)["score"]
         game1 = sv.sc.Game(map_list1, map_highscore1, two_players=two_players1, max_score=max_score1)
-        game_view1 = sv.GameView(SCREEN, CLOCK, game1, base_speed=8)
+        game_view1 = sv.GameView(SCREEN, CLOCK, game1, start_speed=start_speed1, inc_speed=inc_speed)
         winner1 = game_view1.game_loop()
 
         if not two_players1:

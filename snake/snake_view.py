@@ -27,14 +27,15 @@ class GameView:
     }
 
     def __init__(self, screen: pg.Surface, clock: pg.time.Clock,
-                 game: sc.Game, cell_size=30, base_speed=10):
+                 game: sc.Game, cell_size=30, start_speed=10, inc_speed=False):
         self.screen = screen
         self.screen_width, self.screen_height = screen.get_size()
         self.clock = clock
 
         self.game = game
         self.cell_size = cell_size
-        self.base_speed = base_speed
+        self.start_speed = start_speed
+        self.inc_speed = inc_speed
 
         self.map_width_px = self.game.board.dim.x * self.cell_size
         self.map_height_px = self.game.board.dim.y * self.cell_size
@@ -133,8 +134,8 @@ class GameView:
 
     def draw_two_player_score(self):
         """Draw the current score: two player"""
-        text_good = sa.font.render(f"GOOD:  {self.game.score_good}  /  {self.game.max_score}", True, "chartreuse3")
-        text_evil = sa.font.render(f"EVIL:  {self.game.score_evil}  /  {self.game.max_score}", True, "magenta3")
+        text_good = sa.font.render(f"GRÜN:  {self.game.score_good}  /  {self.game.max_score}", True, "chartreuse3")
+        text_evil = sa.font.render(f"LILA:  {self.game.score_evil}  /  {self.game.max_score}", True, "magenta3")
         self.screen.blit(text_good, (60, 30))
         self.screen.blit(text_evil, (self.screen_width - text_evil.get_width() - 60, 30))
 
@@ -336,7 +337,12 @@ class GameView:
             move_event = ""
             move_event_2 = ""
             even_step = not even_step
-            self.clock.tick(self.base_speed * 2)  # limits FPS to 60
+
+            if self.inc_speed:
+                current_speed = self.start_speed + self.game.score // 2
+            else:
+                current_speed = self.start_speed
+            self.clock.tick(current_speed * 2)  # limits FPS to 60
 
 
 
