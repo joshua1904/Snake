@@ -11,6 +11,12 @@ from pathlib import Path
 SOURCE = Path("")
 ```
 
+then create a file 'Snake/highscore.json' inside the top-level folder 'Snake' with following content:
+
+```
+{}
+```
+
 then run `python3 Snake/menu.py`
 
 
