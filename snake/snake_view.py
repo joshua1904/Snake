@@ -212,14 +212,17 @@ class GameView:
                         if event.key == pg.K_LCTRL:
                             speed_2 = False
 
-            if even_step or speed:
-                # update current direction for this step
-                # if pressed_direction_keys_queue is empty, old value of current_direction is used (from last step)
-                while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
-                    current_direction = pressed_direction_keys_queue.popleft()
-                    if current_direction != last_direction:
-                        last_direction = current_direction
-                        break
+
+            # update current direction for this step
+            # if pressed_direction_keys_queue is empty, old value of current_direction is used (from last step)
+            while pressed_direction_keys_queue:  # filter consecutive same directions like 'r', 'r', 'r'
+                current_direction = pressed_direction_keys_queue.popleft()
+                if current_direction != last_direction:
+                    if not (even_step or speed):
+                        pressed_direction_keys_queue.appendleft(current_direction)      # put back in if not even_step! (because didnt move!)
+                    else:
+                        last_direction = current_direction      # change last_direktion only if moved!
+                    break
 
             # check if crash in this direction (no tail-ends!)
             current_direction, next_pos, will_crash = self.game.snake.prepare_move(current_direction)
@@ -227,14 +230,17 @@ class GameView:
             # Snake 2
             if self.game.two_players:
 
-                if even_step or speed_2:
-                    # update current direction for this step
-                    # if pressed_direction_keys_queue is empty, old value of current_direction is used (from last step)
-                    while pressed_direction_keys_queue_2:  # filter consecutive same directions like 'r', 'r', 'r'
-                        current_direction_2 = pressed_direction_keys_queue_2.popleft()
-                        if current_direction_2 != last_direction_2:
-                            last_direction_2 = current_direction_2
-                            break
+
+                # update current direction for this step
+                # if pressed_direction_keys_queue is empty, old value of current_direction is used (from last step)
+                while pressed_direction_keys_queue_2:  # filter consecutive same directions like 'r', 'r', 'r'
+                    current_direction_2 = pressed_direction_keys_queue_2.popleft()
+                    if current_direction_2 != last_direction_2:
+                        if not (even_step or speed_2):
+                            pressed_direction_keys_queue_2.appendleft(current_direction_2)      # put back in if not even_step! (because didnt move!)
+                        else:
+                            last_direction_2 = current_direction_2      # change last_direktion only if moved!
+                        break
 
                 # check if crash in this direction (no tail-ends!)
                 current_direction_2, next_pos_2, will_crash_2 = self.game.snake_2.prepare_move(current_direction_2)
