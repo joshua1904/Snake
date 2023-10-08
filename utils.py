@@ -118,6 +118,23 @@ class InputBox:
         pg.draw.rect(screen, self.color, self.rect, 2)
 
 
+class PopUp:
+    """A pop up for menu"""
+
+    def __init__(self, size_x: int, size_y: int, frame_color=(30, 230, 30), bg_color=(30, 30, 30)):
+        self.size_x, self.size_y = size_x, size_y
+        self.frame_color = frame_color
+        self.bg_color = bg_color
+
+        self.pxl_size_x, self.pxl_size_y = self.size_x * 100, self.size_y * 100
+        self.surface = pg.Surface((self.pxl_size_x, self.pxl_size_y))
+        self.surface.fill(self.frame_color)
+        self.surface.fill(self.bg_color, (10, 10, self.pxl_size_x - 20, self.pxl_size_y - 20))
+
+    def draw(self, target_surface: pg.Surface, center_x: int, center_y: int):
+        target_surface.blit(self.surface, self.surface.get_rect(center=(center_x, center_y)))
+
+
 def create_map_from_image(image: pg.Surface):
     """Image has to be a black and white bitmap, white pixels are walls, size of image is size of map"""
     for y in range(0, image.get_height()):

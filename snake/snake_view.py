@@ -345,7 +345,7 @@ class GameView:
             even_step = not even_step
 
             if self.inc_speed:
-                current_speed = self.start_speed + self.game.score // 2
+                current_speed = self.start_speed + self.game.score // 4
             else:
                 current_speed = self.start_speed
             self.clock.tick(current_speed * 2)  # limits FPS to 60

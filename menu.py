@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Tuple
 
 import pygame as pg
 import menu_assets as ma
@@ -103,25 +104,23 @@ def new_highscore_dialog(map_name: str, game: sv.sc.Game):
     old_winner = utils.get_highscore(map_name)["name"]
     old_message = utils.get_highscore(map_name)["message"]
 
-    highscore_msg_popup = pg.Surface((1200, 700))
-    highscore_msg_popup.fill((30, 230, 30))
-    highscore_msg_popup.fill((30, 30, 30), (50, 50, 1100, 600))
-    highscore_msg_popup.blit(
+    highscore_msg_popup = utils.PopUp(12, 7)
+    highscore_msg_popup.surface.blit(
         ma.font_small.render(f"Du hast einen neuen Highscore von {game.highscore} für diese map erreicht!", True,
                              "white"),
         (100, 100))
-    highscore_msg_popup.blit(
+    highscore_msg_popup.surface.blit(
         ma.font_small.render(f"{old_winner} hat dir eine Nachricht hinterlassen:", True, "white"),
         (100, 150))
-    highscore_msg_popup.blit(ma.font_small.render(f"\"{old_message}\"", True, "salmon"), (100, 225))
-    highscore_msg_popup.blit(ma.font_small.render("Dein Name:", True, "white"), (100, 300))
+    highscore_msg_popup.surface.blit(ma.font_small.render(f"\"{old_message}\"", True, "salmon"), (100, 225))
+    highscore_msg_popup.surface.blit(ma.font_small.render("Dein Name:", True, "white"), (100, 300))
     input_box1 = utils.InputBox(100, 350, 200, 32, active=True, max_len=12, text="Noob")
 
-    highscore_msg_popup.blit(ma.font_small.render("Deine Nachricht:", True, "white"), (100, 400))
+    highscore_msg_popup.surface.blit(ma.font_small.render("Deine Nachricht:", True, "white"), (100, 400))
     input_box2 = utils.InputBox(100, 450, 1000, 32, max_len=64, text="Ich bin ein Noob")
 
-    highscore_msg_popup.blit(ma.font_small.render("- drücke die Strg/Ctrl Taste um fortzufahren -", True, "white"),
-                             (100, 550))
+    highscore_msg_popup.surface.blit(ma.font_small.render("- drücke die Strg/Ctrl Taste um fortzufahren -", True,
+                                                          "white"), (100, 550))
 
     input_boxes = [input_box1, input_box2]
     done = False
@@ -140,10 +139,9 @@ def new_highscore_dialog(map_name: str, game: sv.sc.Game):
 
         # for box in input_boxes:
         # box.update()
-
-        SCREEN.blit(highscore_msg_popup, (SCREEN_WIDTH // 2 - 600, SCREEN_HEIGHT // 2 - 400))
         for box in input_boxes:
-            box.draw(highscore_msg_popup)
+            box.draw(highscore_msg_popup.surface)
+        highscore_msg_popup.draw(SCREEN, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
         pg.display.flip()
         CLOCK.tick(30)
@@ -177,43 +175,51 @@ def winner_dialog(winner: str):
         CLOCK.tick(30)
 
 
-def max_score_dialog() -> int:
+def two_play_options_dialog() -> Tuple[int, int]:
     """
-    Enter max score dialog
+    Enter max score and start speed dialog
     """
-    popup = pg.Surface((100, 100))
-    popup.fill((30, 230, 30))
-    popup.fill((30, 30, 30), (10, 10, 80, 80))
-    popup.blit(ma.font_small.render("bis: ", True, "white"), (20, 20))
 
-    input_box = utils.InputBox(20, 50, 60, 32, always_active=True, max_len=1, text="10", only_digits=True)
+    popup = utils.PopUp(4, 2)
+
+    popup.surface.blit(ma.font_small.render("Bis wie viele Punkte?", True, "white"), (20, 30))
+    input_max_score = utils.InputBox(20, 60, 60, 32, active=True, max_len=1, text="10", only_digits=True)
+    popup.surface.blit(ma.font_small.render("Geschwindigkeit (1-10) :", True, "white"), (20, 120))
+    input_speed = utils.InputBox(20, 150, 60, 32, max_len=1, text="4", only_digits=True)
 
     done = False
     while not done:
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                return -1
+                return -1, -1
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    return -1
+                    return -1, -1
                 elif event.key == pg.K_RETURN:
                     done = True
-            input_box.handle_event(event)
+            input_max_score.handle_event(event)
+            input_speed.handle_event(event)
 
-        SCREEN.blit(popup, popup.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)))
-        input_box.draw(popup)
+        input_max_score.draw(popup.surface)
+        input_speed.draw(popup.surface)
+        popup.draw(SCREEN, SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
         pg.display.flip()
         CLOCK.tick(30)
 
     play_sound(ma.click_sound)
 
-    if input_box.text.isdigit() and len(input_box.text) > 0:
-        max_score = max(1, int(input_box.text))
+    if input_max_score.text.isdigit() and len(input_max_score.text) > 0:
+        max_score = max(1, int(input_max_score.text))
     else:
         max_score = 1
 
-    return max_score
+    if input_speed.text.isdigit() and len(input_speed.text) > 0:
+        speed = min(10, max(1, int(input_speed.text)))      # range 1...10
+    else:
+        speed = 4
+
+    return max_score, speed * 2
 
 
 if __name__ == "__main__":
@@ -225,8 +231,7 @@ if __name__ == "__main__":
             break
 
         if two_players1:
-            max_score1 = max_score_dialog()
-            start_speed1 = 8
+            max_score1, start_speed1 = two_play_options_dialog()
             inc_speed = False
             if max_score1 == -1:
                 continue
