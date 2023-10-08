@@ -1,7 +1,9 @@
 # Snake
 
-## to run:
-create a file 'Snake/settings.py' inside the top-level folder 'Snake' with following content:
+## to install and run:
+run `pip install -r requirements.txt` (= install pygame)
+
+then create a file 'Snake/settings.py' inside the top-level folder 'Snake' with following content:
 
 ```
 from pathlib import Path
@@ -12,7 +14,7 @@ SOURCE = Path("")
 then run `python3 Snake/menu.py`
 
 
-## keys:
+## keys in game:
 - in singleplayer-mode:
   **LEFT**, **RIGHT**, **UP**, **DOWN** for directions and **SPACE** for boost
 - in multiplayer-mode:
