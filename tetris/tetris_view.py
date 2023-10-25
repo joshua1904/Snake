@@ -39,11 +39,15 @@ class TetrisView:
         score_rect = score.get_rect(center=(self.screen_width / 2, 100))
         screen.blit(score, score_rect)
 
-    def draw_rect(self, screen, pixel: int, y: int, x: int):
-        pygame.draw.rect(screen, PIXEL_MAP[pixel],
-                         (self.game_pitch_start_x + x * self.pixel_width, self.game_pitch_start_y +
-                          y * self.pixel_width, self.pixel_width, self.pixel_width), )
+    def draw_rect(self, screen, pixel: int, y: int, x: int, fake_form=False):
 
+        if fake_form:
+            pygame.draw.rect(screen, PIXEL_MAP[pixel],
+                             (self.game_pitch_start_x + x * self.pixel_width, self.game_pitch_start_y +
+                              y * self.pixel_width, self.pixel_width, self.pixel_width), 2)
+            return
+        screen.blit(PIXEL_MAP[pixel], (self.game_pitch_start_x + x * self.pixel_width, self.game_pitch_start_y +
+                          y * self.pixel_width))
     def draw_pitch(self, screen):
         pygame.draw.rect(screen, "white", (self.game_pitch_start_x, self.game_pitch_start_y
                                            , self.pixel_width * 10, self.pixel_width * 20), 2)
@@ -56,12 +60,14 @@ class TetrisView:
 
     def draw_form(self):
         color = self.game_logic.pitch.moving_form.get_color_int()
-        for pixel in self.game_logic.pitch.moving_form.get_pixel_positions():
-            self.draw_rect(self.screen, color, pixel[0], pixel[1])
+        for counter, pixel in enumerate(self.game_logic.pitch.moving_form.get_pixel_positions()):
+            #TODO Rename color
+            #Color ist ein tuple jedes teil einer Form hat sein eigenes bild
+            self.draw_rect(self.screen, color[counter], pixel[0], pixel[1])
 
     def draw_fake_form(self, screen, fake_form):
         for pixel in fake_form.get_pixel_positions():
-            self.draw_rect(screen, 0, pixel[0], pixel[1])
+            self.draw_rect(screen, -1, pixel[0], pixel[1], fake_form=True)
 
     def draw_special_forms(self, screen, location: tuple, form):
         pygame.draw.rect(screen, "white", (
@@ -70,10 +76,9 @@ class TetrisView:
             fake_form_draw = copy.deepcopy(form)
             fake_form_draw.set_pos(location[0], location[1])
             color = fake_form_draw.get_color_int()
-            for pixel in fake_form_draw.get_pixel_positions():
-                pygame.draw.rect(screen, PIXEL_MAP[color], ((pixel[1] + 1) * self.pixel_width,
-                                                            (pixel[0] + 1) * self.pixel_width, self.pixel_width,
-                                                            self.pixel_width), 5)
+            for counter, pixel in enumerate(fake_form_draw.get_pixel_positions()):
+                screen.blit(PIXEL_MAP[color[counter]], ((pixel[1] + 1) * self.pixel_width,
+                                                        (pixel[0] + 1) * self.pixel_width))
 
     def game_loop(self):
         running = True

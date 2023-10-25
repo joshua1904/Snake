@@ -2,8 +2,8 @@ import copy
 from collections import deque
 from tetris.forms.form import Form
 from tetris.forms.quadrangle import Quadrangle
-from tetris.tetris_assets import clear_row
-PIXEL_MAP = {0: "grey", 1: "red", 2: "blue", 3: "green", 4: "yellow", 5: "violet"}
+from tetris.tetris_assets import clear_row, img_normal, img_down, img_right, img_left
+PIXEL_MAP = {-1: "white", 0: img_normal, 1: img_left, 2: img_right, 3: img_down, 4: img_normal, 5: img_normal, 6: img_normal, 7: img_normal, 8: img_normal, 9: img_normal, 10: img_normal, 11: img_normal, 12: img_normal, 13: img_normal, 14: img_normal, 15: img_normal, 16: img_normal}
 
 
 class Pitch:
@@ -21,8 +21,8 @@ class Pitch:
 
     def add_form_to_pitch(self):
         color_int = self.moving_form.get_color_int()
-        for pos in self.moving_form.get_pixel_positions():
-            self.pitch_list[pos[0]][pos[1]] = color_int
+        for counter, pos in enumerate(self.moving_form.get_pixel_positions()):
+            self.pitch_list[pos[0]][pos[1]] = color_int[counter]
 
     def delete_form_from_pitch(self, pixel_positions: list):
         for pos in pixel_positions:
